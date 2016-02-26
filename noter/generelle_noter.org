@@ -1,0 +1,3 @@
+Foreløbige spørgsmål
+  Forskellen på type expressions, type definitions og kinds
+  læse op på Subst.

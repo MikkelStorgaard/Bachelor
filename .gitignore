@@ -1,0 +1,10 @@
+minBachelorprojektaftale.pdf
+vfr988.underskrevet_bachelorkontrakt.pdf
+futhark
+litteratur
+
+#ignored file endings
+*.bak
+*.log
+*.aux
+*.gz

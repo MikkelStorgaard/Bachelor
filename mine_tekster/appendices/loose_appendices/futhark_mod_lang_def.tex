@@ -1,0 +1,74 @@
+\begin{tabular}{p{4em} p{7em} p{11em} p{16em}}
+  \parbox[t]{4em}{Language part} & \parbox[t]{4em}{language \\construct} & definition & example \\
+  Core:         &&& \\
+                & dec ::= 
+                  & \texttt{type} \textit{t} \texttt{=} \textit{type\_def}
+                    & \texttt{(* type Status = int *)}  \\
+                & $|$
+                  & \texttt{fun} \textit{f} \textit{args} \texttt{=} \textit{exp}
+                    & \texttt{(* fun foo n = n + 5 *)} \\
+                & $|$ 
+                  & \texttt{val} \textit{x} \texttt{=} \textit{exp}
+                    & \texttt{(* val eleven = 11 *)} \\
+                \\
+Module:         &&& \\
+                & topdec ::=
+                  & \textit{sigdec} & \\
+                & $|$
+                  & \textit{moddec} & \\
+                &$|$
+                  & \textit{topdec} \textit{topdec} & \\
+                \\
+                & sigdec ::=
+                  & \texttt{signature} \textit{X} \texttt{=} \textit{sigexp}
+                    & \texttt{(* signature foo = ... *)} \\\\
+                & sigexp ::=
+                  & \texttt{sig} \textit{sigspec} \texttt{end}
+                    & \texttt{(* sig val bar : int end *)} \\
+                & $|$
+                  & \textit{X}
+                    & \texttt{(*\{foo, bar, One, ... \}*)} \\
+                \\
+                & sigspec
+                  & \texttt{val} x \texttt{:} type
+                    & \texttt{(* val bar : string *)} \\
+                & $|$
+                  & \texttt{module} \textit{X} \texttt{:} \textit{sigexp}
+                    & \texttt{(* module Bar : Numberable *)} \\
+                & $|$
+                  & sigspec sigspec & \\
+                \\
+                & moddec ::=
+                  & \textit{dec}
+                    & \\
+                & $|$
+                  & \texttt{module} \textit{X} \texttt{=} \textit{modexp}
+                    & \texttt{(* module One = ... *)} \\
+                &$|$
+                  & moddec moddec
+                    & \texttt{(* val x = 1 val y = 2 *)} \\
+                \\
+                & modexp ::=
+                  & \texttt{struct} \textit{moddec} \texttt{end}
+                    & \parbox[t]{15em}{\texttt{(* struct} \\
+                                \texttt{module Adder = PlusOp} \\
+                                \texttt{val one = 1} \\
+                              \texttt{end *)}}
+                              \\\\
+                & $|$
+                  & \textit{modexp} \texttt{:} \textit{sigexp}
+                    & \parbox[t]{10em}{\texttt{(* struct} \\
+                                \texttt{val bar = 1} \\
+                              \texttt{end : foo *)}} \\\\
+                & $|$
+                  & \textit{X}
+                    & \texttt{(* \{One, Numberable, Counter, Queue, ... \} *)}  \\
+                \\                    
+Module access:  &&& \\
+                & LongIdent ::=
+                  & \textit{module}\texttt{.}\textit{field}
+                    & \texttt{(* One.bar *)} \\
+                &$|$
+                  & \textit{module}\texttt{.}\textit{LongIdent}
+                    & \texttt{(* Numberable.One.bar *)} \\
+\end{tabular}
