@@ -1,3 +1,4 @@
 [submodule "futhark"]
 	path = futhark
 	url = https://github.com/HIPERFIT/futhark
+	branch = futhark_mod
