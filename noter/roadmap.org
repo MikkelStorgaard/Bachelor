@@ -2,9 +2,13 @@ Dette dokument fungerer som roadmap for mit bachelorprojekt. vh. Miked
 
 * At implementere, teste og dokumentere et modul-system i programmeringssproget Futhark
 ** Implementation
-*** [] Designe AST for modulimplementation
-**** Tag inspiration fra Modular Modules , læs op via Torbens "Introduction to Compilers"
-**** definere hvad modulsproget skal kunne: 
+*** Designe AST for modulimplementation [2/2] 
+CLOSED: [2016-03-03 Thu 13:27]
+**** DONE Tag inspiration fra Modular Modules , læs op via Torbens "Introduction to Compilers"
+CLOSED: [2016-03-03 Thu 13:27]
+
+**** DONE definere hvad modulsproget skal kunne: 
+CLOSED: [2016-03-03 Thu 13:26]
    moddec :: = dec
              | module X = modexp |
              | moddec moddec..
@@ -12,13 +16,15 @@ Dette dokument fungerer som roadmap for mit bachelorprojekt. vh. Miked
 
 
 
-*** [] Lave gren af Futhark (hvad er her den bedste fremgangsmåde?)
-*** [] Udvide Futharks Lexer og Parser til at understøtte modulerne 
-**** [] Udvide Lexer.hs
+***  Lave gren af Futhark (hvad er her den bedste fremgangsmåde?)
+*** Udvide Futharks Lexer og Parser til at understøtte modulerne  [0/4]
+**** TODO Udvide Syntax.hs
 *****  noter:
-**** [] Udvide Parser.hs
-***** noter:
-**** [] Udvide TypeChecker.hs (ja/nej)?
+**** TODO Udvide Lexer.hs
+*****  noter:
+**** TODO Udvide Parser.hs
+***** noter: 
+**** TODO Udvide TypeChecker.hs (ja/nej) ?
 **** Hvad skal der ske herefter?
 ** Tests
 *** Implementation af en vektor-funktor
