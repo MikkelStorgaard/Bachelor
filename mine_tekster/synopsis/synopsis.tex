@@ -145,39 +145,37 @@ Succeskriterierne for projektet er følgende:
 \section{Arbejdsopgaver}
 Projektet kan, udover udførelsen af en bachelorrapport, deles op i tre
 hoveddele:\\
-\textit{Parsing og typecheck}, \textit{implementation af modulkald}, og \textit{tests}.
-\subsection{Parsing og typecheck}
-\subsubsection{Design af Futhark-modulers AST}
-Produkt: Et AST, der beskriver futhark-moduler.
-Ressourcekrav: Ingen nævneværdige.
-Interne afhængigheder: Ingen.
-\subsubsection{Udvidelse af lexer til understøttelse af moduler}
-Produkt: En udvidet udvidelse af Futharks lexer-system.
-Ressourcekrav: Ingen nævneværdige.
-Interne afhængigheder: Et færdigt design af AST.
-\subsubsection{Udvidelse af parser til understøttelse af moduler}
-Produkt: En udvidet udvidelse af Futharks parser-system.
-Ressourcekrav: Vejledning v. Futhark-designer Troels Henriksen, omkring enkelte
-detaljer i Futharks oversætter.
-Interne afhængigheder: Et færdigt design af AST.
-\subsubsection{Udvidelse af typechecker til understøttelse af moduler}
-Produkt: En udvidelse af Futharks typechecker-system.
-Ressourcekrav: Vejledning v. Futhark-designer Troels Henriksen, omkring enkelte
-detaljer i Futharks oversætter.
-Interne afhængigheder: Et færdigt design af AST.
+Implementation af type-aliasser i Futhark, implementation af signaturer og
+moduler i Futhark, og slutteligt implementation af (SML)-funktorer i Futhark.\\
+For hver af de tre delopgaver, gælder det, at
+\begin{enumerate}
+  \item der skal udarbejdes et abstrakt syntaks-træ
+  \item opgaven skal implementeres i Futharks kodebase
+  \item løsningen skal testes og dokumenteres i projektrapporten.
+\end{enumerate}
 
-\subsection{Implementation af modulkald i Futhark}
-\subsubsection{Udvidelse af Futhark internaliser, så prik-notation linker korrekt til
-  modulers indhold}
-Produkt: En udvidet internaliser, der forbinder modul-kald til modulers indhold.
-Interne afhængigheder: At typechecker, parser og lexer fungerer.
-<<<<<<<<<< her skal lige undersøges, hvordan id'er bliver tilgået i parseren
->>>>>>>>>>
-Interne afhængigheder: Ingen nævneværdige, da lexer, parser, typechecker og
-implementation kan laves nogenlunde sideløbende.
 
-\subsubsection{Implementation af funktorer}
-...
+\subsection{Implementation af type-aliasser}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
+Interne afhængigheder: Ingen
+Tidsforbrug: Uge 11 til 13.
+
+\subsection{Implementation af signaturer og strukturer}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på
+github.com\ref{futhark-repo}. Desuden vejledning fra Futhark-designer Troels Henriksen. 
+Interne afhængigheder: Implementation af typealiasser.
+Tidsforbrug: Uge 13 til 17
+
+
+\subsection{Implementation af funktorer}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på
+github.com\ref{futhark-repo}. 
+Desuden vejledning fra Futhark-designer Troels Henriksen. 
+Interne afhængigheder: Implementation af af signaturer og strukturer
+Tidsforbrug: Uge 17 til 20
 
 \subsection{Tests}
 \subsubsection{\textit{Ad hoc} udvikling af simple testprogrammer, til løbende afprøvning 
@@ -187,11 +185,15 @@ inputs, og forventede outputs.
 Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
 Interne afhængigheder: Testprogrammerne vil allesammen som udgangspunkt fejle,
 men flere og flere vil køre korrekt, jo mere færdig Futhark-moduler-implementationen bliver.
+Tidsforbrug: Løbende under hele implementationsforløbet.
+
 \subsubsection{Udvikling af simple testprogrammer, til afprøvning 
 af det færdige modulsystem}
 Produkt: Testprogrammer skrevet i Futhark.
 Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
 Interne afhængigheder: Et færdigt modulsystem.
+Tidsforbrug: Uge 19-20.
+
 \section{Overvejelser og tidsplan}
 \textbf{Litteratur}
 \begin{thebibliography}
