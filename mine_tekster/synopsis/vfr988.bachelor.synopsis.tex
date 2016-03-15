@@ -1,0 +1,213 @@
+\documentclass[12pt]{article}
+%	options include 12pt or 11pt or 10pt
+%	classes include article, report, book, letter, thesis
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgffor}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{dsfont}
+\usepackage{relsize}
+\usepackage{float}
+\usepackage{pgffor}
+\usepackage[margin=1in]{geometry}
+
+\title{
+  Synopsis - Modules in Futhark
+}
+\author{vfr988}
+\begin{document}
+\maketitle
+\clearpage
+\\
+\section*{Problemformulering}
+Er det muligt at udvide Futhark med moduler, signaturer og funktorer, med SMLs
+modulsystem som inspiration \ref{crash-course}?
+\\
+% \\
+\section*{Begrundelse}
+SMLs modulsystem tillader definitionen af abstrakte strukturer, der
+konkretiseres gennem et funktor-kald med en type.
+Ved compile-time optimeres kald til modulerne væk, og efterlader almindelig kode.\\
+Da Futhark oversættes til kode med en meget høj grad af parallelisering, vil et
+modulsystem give Futhark-udvikleren mulighed for at benytte sig af polymorfi,
+uden det går ud over det oversatte programs endelige køretid.
+
+Muligheden for at inkludere eksterne moduler i et program betyder, at en
+programmør kan skrive et bibliotek af moduler, og siden hen inkludere disse
+moduler i sine programmer \emph eksempelvis kan han skrive moduler til
+matrixregning, eller listefunktioner.
+
+Succeskriterierne for projektet er følgende:
+\begin{itemize}
+\item \textbf{At Futharks modul-system oversættes til maskinkode korrekt} \\
+  Hvorvidt dette lykkes, vil primært blive målt på, hvorvidt Futhark succesfuldt udfører testprogrammer, der udnytter modulsystemet. \\ Der vil i bachelorraporten også blive ført bevis for, at værdier der tilgås gennem modulsystemet, evaluerer på samme måde som værdier der tilgås i Futhark-kode, der ikke benytter modulsystemet. Såfremt dette er beviseligt, er succeskriteriet opfyldt.
+\item \textbf{At et Futhark-program der benytter modulsystemet, performer ligeså godt
+  som et tilsvarende program, implementeret uden anvendelse af moduler} \\
+  Dette kriterie måles ved hjælp af måling af CPU-tid brugt af sammenlignelige Futhark-programmer, hvoraf kun det ene benytter sig af modulsystemet. Såvidt programmerne yder lige godt, er dette succeskriterie opfyldt.
+\item \textbf{At Futharks usability øges gennem muligheden for at kalde modulers værdier
+  gennem prik-notation.}\\
+  Hvorvidt dette successkriterie er opfyldt, vil blive bedømt gennem interviews med brugere, som arbejder med Futhark til dagligt.
+\end{itemize}
+
+%% 
+%% Se nedenstående signatur:
+%% \begin{verbatim}
+%% signature Container = 
+%%   sig
+%%     type content
+%%     type container : content list
+%%      val empty : container
+%%      val add   : content -> container -> container
+%%      val get   : container -> content option
+%%   end
+%% \end{verbatim}
+%% Abstraktionen af Table-strukturen fortæller læseren, hvad en struktur af typen
+%% Table kan gøre. Men den definerer ikke, hvordan Table skal implementeres.
+%% En implementation af Table kan derfor f.eks. se sådan her ud:
+%% \begin{verbatim}
+%% module Stack =
+%%   struct
+%%     type content = int
+%%     type container = int list
+%%     val empty = []
+%%     fun add item stack = item :: stack
+%%     fun get stack = peek stack
+%% 
+%%     fun peek []    = NONE
+%%       | peek item::items = SOME item
+%% 
+%%     fun pop []    = NONE
+%%       | pop item::items = SOME (item , items)
+%%   end : Container
+%% \end{verbatim}
+%% Strukturen Stack er defineret, og overholder som minimum de værdier, der er
+%% defineret i signaturen. 
+%% Derudover kan strukturen evt. udvise flere egenskaber, end blot de, der er
+%% definerede i dens signatur.
+%% 
+%% Når et modul er defineret, kan man tilgå dets elementer vha. prik-notation:
+%% \begin{verbatim}
+%% FooBar.futmod:
+%%   signature Number =
+%%     sig
+%%       val value : int
+%%     end
+%% 
+%%   module One =
+%%     struct
+%%       val value = 1
+%%     end : Number
+%% 
+%%   signature NumOp =
+%%     sig
+%%       val op : int -> int -> int
+%%     end
+%% 
+%%   module Adder =
+%%     mod
+%%       fun op x y = add x y
+%%       fun add x y = x + y
+%%     end : NumOp
+%%   
+%%   signature Bar =
+%%     sig
+%%       num : Number
+%%       op : NumUp
+%%     end
+%% 
+%%   module Foo =
+%%     mod
+%%        val num = One
+%%        val op = Adder
+%%     end : Bar
+%% 
+%% 
+%% some_fut_program.fut;
+%%   include 'FooBar.futmod'
+%% 
+%%   fun int three =
+%%     let
+%%       val two = One.num + One.num
+%%       val three = Adder.op Foo.one two
+%%       val four  = Foo.op.op Foo.num.value three
+%%     in 
+%%       four
+%% \end{verbatim}
+%% 
+%% Modulsystemet understøtter indlejrede moduler.
+%% 
+
+\section{Arbejdsopgaver}
+Projektet kan, udover udførelsen af en bachelorrapport, deles op i tre
+hoveddele:\\
+Implementation af type-aliasser i Futhark, implementation af signaturer og
+moduler i Futhark, og slutteligt implementation af (SML)-funktorer i Futhark.\\
+For hver af de tre delopgaver, gælder det, at
+\begin{enumerate}
+  \item der skal udarbejdes et abstrakt syntaks-træ
+  \item opgaven skal implementeres i Futharks kodebase
+  \item løsningen skal testes og dokumenteres i projektrapporten.
+\end{enumerate}
+
+
+\subsection{Implementation af type-aliasser}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
+Interne afhængigheder: Ingen
+Tidsforbrug: Uge 11 til 13.
+
+\subsection{Implementation af signaturer og strukturer}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på
+github.com\ref{futhark-repo}. Desuden vejledning fra Futhark-designer Troels Henriksen. 
+Interne afhængigheder: Implementation af typealiasser.
+Tidsforbrug: Uge 13 til 17
+
+
+\subsection{Implementation af funktorer}
+Produkt: udvidelse af Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på
+github.com\ref{futhark-repo}. 
+Desuden vejledning fra Futhark-designer Troels Henriksen. 
+Interne afhængigheder: Implementation af af signaturer og strukturer
+Tidsforbrug: Uge 17 til 20
+
+\subsection{Tests}
+\subsubsection{\textit{Ad hoc} udvikling af simple testprogrammer, til løbende afprøvning 
+modulsystem}
+Produkt: Testprogrammer skrevet i Futhark. Disse programmer vil have definerede
+inputs, og forventede outputs.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
+Interne afhængigheder: Testprogrammerne vil allesammen som udgangspunkt fejle,
+men flere og flere vil køre korrekt, jo mere færdig Futhark-moduler-implementationen bliver.
+Tidsforbrug: Løbende under hele implementationsforløbet.
+
+\subsubsection{Udvikling af simple testprogrammer, til afprøvning 
+af det færdige modulsystem}
+Produkt: Testprogrammer skrevet i Futhark.
+Ressourcekrav: Futhark-dokumentation. Denne er tilgængelig på github.com\ref{futhark-repo}.
+Interne afhængigheder: Et færdigt modulsystem.
+Tidsforbrug: Uge 19-20.
+
+\section{Overvejelser og tidsplan}
+\textbf{Litteratur}
+\begin{thebibliography}
+
+\bibitem[A crash course on ML Modules]{crash-course}
+Danny Gratzer, \textit{A crash course on ML modules}
+\url{http://jozefg.bitbucket.org/posts/2015-01-08-modules.html}
+
+\bibitem[Official Futhark Github Repo]{futhark-repo}
+HIPERFIT, APL section on Datalogisk Institut, KU.
+Official Futhark Github Repo and documentation
+\url{https://github.com/HIPERFIT/futhark}
+\end{thebibliography}
+\end{document}
+
