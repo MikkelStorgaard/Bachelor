@@ -1,0 +1,157 @@
+\subsection{Abstract}
+\label{subsec:abstract}
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+\subsection{Problem definition}
+\label{subsec:probdef}
+Is it possible to implement a module system in Futhark, which displays features
+comparable to the module system implemented in Standard ML? \cite{sml modules}
+%% sml-henvisninger fra bogen måske?
+
+\subsection{Motivation}
+\label{subsec:label}
+The implementation of a module system, will greatly expand the usability of
+Futhark, without having side effects on the performance of the compiled Futhark code.
+\subsubsection{Futhark usability and portability}
+\label{subsec:usability}
+To be able to claim, that modules increases usability, we must first
+setup some definitions of usability.
+
+\textbf{Abstraction increases readability.} In example, type aliasing lets us abstract
+from the actual definition of data types.
+When writing our source code, we can define our type aliases before writing the
+rest of our program.
+%% skriv bedre
+If we want to define a sphere in a three dimensional space, we want to define it
+with 1) a radius, 2) a position , and 3) a direction that it is
+moving. 
+
+Let us define a function that multiplies the speed of the sphere by a factor k.
+\begin{verbatim}
+fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity({f32 r, {f32 x_pos , f32 y_pos , f32 z_pos} , {f32 x_dir,
+f32 y_dir, f32 z_dir}} , f32 k) =
+  {r, {x_pos, y_pos, z_pos}, {k * x_dir , k * y_dir, k * z_dir }}
+\end{verbatim}
+
+With type aliasing, we can compartmentalize the data type, and remove the need
+for explicitally typing out every parameter of function input.
+Coupled with helper functions, we can now multiply the speed of the sphere like
+this:
+
+\begin{verbatim}
+type vec3 = {f32, f32, f32}
+type position, direction = vec3 
+type radius = f32
+type sphere = {radius, position, direction}
+
+fun vec3 multiply_vector(vec3 {pos_x, pos_y, pos_z}, f32 k) =
+  {k * pos_x , k * pos_y , k * pos_z}
+
+fun sphere multiply_velocity(sphere {radius, position, direction}, f32 factor) =
+  let new_direction = multiply_vector(direction, factor)
+  in {radius, position, new_direction}
+\end{verbatim}
+
+As we are now using the sphere type as the function argument, we can pattern
+match on the type aliased values contained in the sphere type.
+Most importantly, the vectors of the sphere are abstracized into a single variables
+instead of tuples.
+
+The end result is a shorter, more readable program. %% se bilag sphere test
+
+
+\textbf{Module language allows for better compartmentalizing and code sharing} \\
+Without modules, every function and type in futhark shares the same scope.
+Implementing modules lets us create functions that are alike, but keeps
+distinctions between them.
+Take this example of a program with two different vector types:
+
+\begin{verbatim}
+type vec3 = {f32, f32, f32}
+type vec4 = {f32, f32, f32, f32}
+
+fun vec3 vec3_plus(vec3 {a_1, ... , a_3}, vec3 {b_1, ..., b_3}) =
+  {a_1 + b_1, ... , a_3 + b_3}
+
+fun vec4 vec4_plus(vec4 {a_1, ... , a_4}, vec4 {b_1, ..., b_4}) =
+  {a_1 + b_1, ... , a_4 + b_4}
+\end{verbatim}
+
+Let us try compartmentalizing a vector type and its functions into a module
+structure.
+In the following example, we have defined two different futhark modules, each
+containing a structure,
+and a futhark program which includes and utilizes these modules:
+\begin{verbatim}
+Vec3Float.fut:
+  structure Vec3Float = 
+    struct
+      type vector = {f32, f32, f32}
+      fun vector plus( ... ) = ...
+      fun vector minus( ... ) = ...
+      fun vector multiply ( ... ) = ...
+    end
+
+Vec4Float.fut:
+  structure Vec4Float = 
+    struct
+      type vector = {f32, f32, f32, f32}
+      fun vector plus( ... ) = ...
+      fun vector minus( ... ) = ...
+      fun vector multiply ( ... ) = ...
+    end
+  
+myprogram.fut:
+
+  include Vec3Float
+  include Vec4Float
+
+  type vec3 = Vec3Float.vector
+  type vec4 = Vec4Float.vector
+  
+  fun vec4 foo(vec3 vector) = 
+    let {a, b, c} = Vec3.plus(vector, vector)
+    in Vec4.multiply({a, b, c, 1.0f} , 4.0f)
+\end{verbatim}
+
+Whilst it \textit{is} possible to create libraries without a module
+implementation, the user runs a risk of running into errors like
+\texttt{MulipleDefinitionError}\footnote{Multiple functions of same name
+  defined}, if any of the library functions uses any of the names, that the
+local user is using as well.
+
+The module system removes this hazard, as names from an imported module
+\texttt{Foo} are accessed through dot-notation, as shown in line %% FIX %%
+in the example above.
+
+An obvious use case is including a library of standard modules with the Futhark
+language, as the ones displayed in other languages like Standard
+ML\cite{sml_standard_lib} or Python\cite{python3_docs}.
+
+%% mere her
+
+
+
+%% this is elaborated on during the scope
+The function calls \texttt{let res = best_function(arg)} and
+\texttt{let res = MyModule.best_function(arg)} are calls to two difference
+functions.
+
+
+
+\subsubsection{Achieving higher order functionality whilst keeping up performance}
+\label{subsec:label}
+%% reference to 
+
+\subsubsection{Inspiration from Standard ML}
+
+\subsection{Scope of project}
+\label{subsec:label}
+
+\subsection{Success definitions}
+\label{subsec:label}
+

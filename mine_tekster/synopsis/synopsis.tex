@@ -30,7 +30,6 @@
 Er det muligt at udvide Futhark med moduler, signaturer og funktorer, med SMLs
 modulsystem som inspiration \ref{crash-course}?
 \\
-% \textbf{Afgrænsning af problemformulering}
 % \\
 \section*{Begrundelse}
 SMLs modulsystem tillader definitionen af abstrakte strukturer, der
@@ -47,11 +46,14 @@ matrixregning, eller listefunktioner.
 
 Succeskriterierne for projektet er følgende:
 \begin{itemize}
-\item At Futharks modul-system oversættes til maskinkode korrekt
-\item At et Futhark-program der benytter modulsystemet, performer ligeså godt
-  som et tilsvarende program, implementeret uden anvendelse af moduler
-\item At Futharks usability øges gennem muligheden for at kalde modulers værdier
-  gennem prik-notation.
+\item \textbf{At Futharks modul-system oversættes til maskinkode korrekt} \\
+  Hvorvidt dette lykkes, vil primært blive målt på, hvorvidt Futhark succesfuldt udfører testprogrammer, der udnytter modulsystemet. \\ Der vil i bachelorraporten også blive ført bevis for, at værdier der tilgås gennem modulsystemet, evaluerer på samme måde som værdier der tilgås i Futhark-kode, der ikke benytter modulsystemet. Såfremt dette er beviseligt, er succeskriteriet opfyldt.
+\item \textbf{At et Futhark-program der benytter modulsystemet, performer ligeså godt
+  som et tilsvarende program, implementeret uden anvendelse af moduler} \\
+  Dette kriterie måles ved hjælp af måling af CPU-tid brugt af sammenlignelige Futhark-programmer, hvoraf kun det ene benytter sig af modulsystemet. Såvidt programmerne yder lige godt, er dette succeskriterie opfyldt.
+\item \textbf{At Futharks usability øges gennem muligheden for at kalde modulers værdier
+  gennem prik-notation.}\\
+  Hvorvidt dette successkriterie er opfyldt, vil blive bedømt gennem interviews med brugere, som arbejder med Futhark til dagligt.
 \end{itemize}
 
 %% 
@@ -197,11 +199,12 @@ Tidsforbrug: Uge 19-20.
 \section{Overvejelser og tidsplan}
 \textbf{Litteratur}
 \begin{thebibliography}
-\bibitem[A crash course on ML Modules]{crash-course}
-Danny Gratzer, \textit{A crash course on ML modules}
-\texttt{http://jozefg.bitbucket.org/posts/2015-01-08-modules.html}
 
-\bibitem[Official Futhark Github Repo]{futhark-repo}
+\bibitem[MLmod]{crash-course}
+Danny Gratzer, \textit{A crash course on ML modules}
+\url{http://jozefg.bitbucket.org/posts/2015-01-08-modules.html}
+
+\bibitem[Futhark]{futhark-repo}
 HIPERFIT, APL section on Datalogisk Institut, KU.
 Official Futhark Github Repo and documentation
 \url{https://github.com/HIPERFIT/futhark}
