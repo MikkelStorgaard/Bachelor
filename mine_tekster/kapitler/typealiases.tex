@@ -1,0 +1,422 @@
+\section{Type aliases}
+%% introduction
+\subsection{the language}
+The initial type system in Futhark supported the following type definitions:
+\begin{align*}
+  Type           & = & Primitive type
+                 & | & { Types }
+                 & | & [ Type ]
+  \\
+  \\
+  Types          & = & Type , Types
+                 & | & Type
+  \\
+  \\
+  Primitive type & = & UnsignedInteger \\
+                 & | & SignedInteger \\
+                 & | & FloatType \\
+                 & | & Boolean \\
+\end{align*}
+
+Implementing type aliases expands our type constructions as following:
+\begin{align*}
+  Type           & : & Primitive type
+                 & | & { Types }
+                 & | & [ Type ]
+                 & | & TypeAlias
+  \\
+  \\
+  Types          & : & Type , Types
+                 & | & Type
+  \\
+  \\
+  Primitive type & : & UnsignedInteger \\
+                 & | & SignedInteger \\
+                 & | & FloatType \\
+                 & | & Boolean \\
+  \\
+  \\
+  TypeAlias      & : & string
+\end{align*}
+
+\subsection{rules (SAT-like mapping }
+A type alias in a Futhark program is done like this:\\
+\indent \texttt{type} \textit{name} \texttt{=} \textit{Type} , where Type is as
+defined in the grammar above.
+\subsection{Implementation}
+A type alias $alias_i$ declaration is succesful, if three rules are followed:
+\begin{enumerate}
+  \item The alias $alias_i$ is not already declared\footnote[]{This is by convention of
+      only being able to define a value \textit{once}} in the current local
+    scope. I.e. the example below:
+    \begin{verbatim}
+      type foo = i32
+      type foo = f32
+    \end{verbatim}
+    
+  \item The alias $alias_i$ refers to a type (or a type alias), that is either already
+    defined in the current environment (including structure environments), or is
+    in the same declaration chunk as $alias_i$. In the example below, \texttt{foo} refers
+    to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.
+    Therefore, \texttt{foo} can be resolved by resolving \texttt{bar}. The implementation of this
+    described in a later subsection\ref{typealiascode}.
+    \begin{verbatim} 
+      type foo = bar
+      type bar = {f32, i32}
+    \end{verbatim}
+    There are no hard limit to the number of type aliases that has to be
+    checked, before a type alias is resolved:
+    \begin{figure}\label{longchain}
+      \begin{verbatim} 
+        type foo = bar
+        type bar = {f32, baz, i32}
+        type baz = [{bee, bang, boo}]
+        type boo ...
+  
+        ...
+  
+        type bep = i32
+        \end{verbatim}
+      \caption{A long chain of type aliases. These will be resolved by the
+        compiler, even if the compiler has to resolve several undefined aliases,
+      before everything is resolved}
+    \end{figure}
+    Such a chain of type aliases is allowed, as long as the last of the three
+    rules is obeyed:
+  
+    
+  \item The alias being resolved cannot be cyclically defined.
+    Imagine that some type \texttt{type my_type = foo} is in the chain in the
+    type aliasing example\ref{longchain} above.\\
+
+    In this case, the compiler is first trying to resolve \texttt{foo} by
+    resolving \texttt{bar,} and trying to resolving \texttt{bar} by resolving \texttt{baz}, et cetera. \\
+    At some point, the compiler encounters \texttt{my_type}, and must resolve \texttt{foo} to
+    continue - which creates a cycle, because \texttt{foo} is resolved by \texttt{bar}, and so on.
+
+    To keep track of this, the compiler maintains the set of aliases that has
+    been visited in the attempt to resolve some type alias. Every time another
+    type alias has to be checked, the compiler first checks the set to find out,
+    whether this alias is already on the list of aliases that needs to be
+    resolved.
+
+    If so, the compiler returns an error.
+    The implementation of this can be read here\ref{typealiasimplementation}
+
+    
+\end{enumerate}
+\subsection{Parsing a type alias}
+
+
+\subsubsection{Data types for describing a type}
+Initially, the types parsed in a Futhark program were always represented as instances of the
+following datatype \texttt{TypeBase}:
+\begin{lstlisting}[language=Haskell]
+
+  data TypeBase shape as vn = Prim PrimType
+                            | Array (ArrayTypeBase shape as vn)
+                            | Tuple [TypeBase shape as vn]
+
+  data ArrayTypeBase shape as vn =
+        PrimArray PrimType (shape vn) Uniqueness (as vn)
+      -- ^ An array whose elements are primitive types.
+      | TupleArray [TupleArrayElemTypeBase shape as vn] (shape vn) Uniqueness
+      -- ^ An array whose elements are tuples.
+
+  data TupleArrayElemTypeBase shape as vn =
+    PrimArrayElem PrimType (as vn) Uniqueness
+  | ArrayArrayElem (ArrayTypeBase shape as vn)
+  | TupleArrayElem [TupleArrayElemTypeBase shape as vn]
+\end{lstlisting}
+
+These are also the data types that are used in the internal Futhark program.
+
+Before this project, Futhark parsed types from Futhark source code directly to
+TypeBases.
+However, we decided to add an intermediate data type between raw source
+code and TypeBases, to make type aliases available.
+
+\begin{lstlisting}[language=Haskell]
+data UserType vn = UserPrim PrimType SrcLoc
+                 | UserArray (UserType vn) (DimDecl vn) SrcLoc
+                 | UserTuple [UserType vn] SrcLoc
+                 | UserTypeAlias LongName SrcLoc
+                 | UserUnique (UserType vn) SrcLoc
+
+    deriving (Show)
+\end{lstlisting}
+
+The parser was changed, so type declarations in Futhark source would now be parsed as UserTypes and not
+typebases.
+
+\\ faktiske implementering
+\subsubsection{Why we added UserType instead of extending TypeBase}
+Adding UserType and then resolving these into TypeBases whilst running the
+program through the TypeChecker, removes the need of handling UserAliases after
+the type check, where these aliases are resolved.
+
+\label{typeclarification} Furthermore, not all information about a TypeBase declaration
+can actually be claimed already at program parse time.
+Some information about i.e. IKKE SIKKER HER array dimensionality in regards to aliased arrays, is decided within the type
+checker as well. 
+
+
+
+\subsubsection{the slip from type aliases to realized types}
+\subsection{results}
+\subsubsection{example of planet simulations being simplified by type aliases}
+A nice example of the benefits of type aliasing, is the N-body simulation
+(\texttt{nbody}), which is a simulation over the n-body
+problem\footnote{\href{https://en.wikipedia.org/wiki/N-body_problem}}.
+
+The original Futhark implementation of the simulation contained function
+arguments of tuples with arity up to 10. Whilst it is still necessary to bring
+all the arguments throughout the program, type aliasing makes the program itself
+much more readable:
+\begin{lstlisting}
+ -- N-body simulation based on the one from Accelerate:
+-- https://github.com/AccelerateHS/accelerate-examples/tree/master/examples/n-body
+--
+-- Type descriptions:
+--
+-- type mass = f32
+-- type position = {f32, f32, f32}
+-- type acceleration = {f32, f32, f32}
+-- type velocity = {f32, f32, f32}
+-- type body = (position, mass, velocity, acceleration)
+--           =~ {f32, f32, f32, -- position
+--               f32,           -- mass
+--               f32, f32, f32, -- velocity
+--               f32, f32, f32} -- acceleration
+--
+
+fun {f32, f32, f32}
+  vec_add({f32, f32, f32} v1,
+               {f32, f32, f32} v2) =
+  let {x1, y1, z1} = v1
+  let {x2, y2, z2} = v2
+  in {x1 + x2, y1 + y2, z1 + z2}
+
+fun {f32, f32, f32}
+  vec_subtract({f32, f32, f32} v1,
+               {f32, f32, f32} v2) =
+  let {x1, y1, z1} = v1
+  let {x2, y2, z2} = v2
+  in {x1 - x2, y1 - y2, z1 - z2}
+
+fun {f32, f32, f32}
+  vec_mult_factor(f32 factor,
+                  {f32, f32, f32} v) =
+  let {x, y, z} = v
+  in {x * factor, y * factor, z * factor}
+
+fun f32
+  dot({f32, f32, f32} v1,
+      {f32, f32, f32} v2) =
+  let {x1, y1, z1} = v1
+  let {x2, y2, z2} = v2
+  in x1 * x2 + y1 * y2 + z1 * z2
+  
+fun {f32, f32, f32}
+  accel(f32 epsilon,
+        {f32, f32, f32} pi,
+        f32 mi,
+        {f32, f32, f32} pj,
+        f32 mj) =
+  let r = vec_subtract(pj, pi)
+  let rsqr = dot(r, r) + epsilon * epsilon
+  let invr = 1.0f32 / sqrt32(rsqr)
+  let invr3 = invr * invr * invr
+  let s = mj * invr3
+  in vec_mult_factor(s, r)
+
+fun {f32, f32, f32}
+  accel_wrap(f32 epsilon,
+             {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body_i,
+             {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body_j) =
+  let {xi, yi, zi, mi, _, _, _, _, _, _} = body_i
+  let {xj, yj, zj, mj, _, _, _, _, _, _} = body_j
+  let pi = {xi, yi, zi}
+  let pj = {xj, yj, zj}
+  in accel(epsilon, pi, mi, pj, mj)
+  
+fun {f32, f32, f32}
+  move(f32 epsilon,
+       [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}] bodies,
+       {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body) =
+  let accels = map(fn {f32, f32, f32} ({f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body_other) =>
+                     accel_wrap(epsilon, body, body_other),
+                   bodies)
+  in reduceComm(vec_add, {0f32, 0f32, 0f32}, accels)
+
+fun [{f32, f32, f32}]
+  calc_accels(f32 epsilon,
+              [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}] bodies) =
+  map(move(epsilon, bodies), bodies)
+
+fun {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}
+  advance_body(f32 time_step,
+               {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body) =
+  let {xp, yp, zp, mass, xv, yv, zv, xa, ya, za} = body
+  let pos = {xp, yp, zp}
+  let vel = {xv, yv, zv}
+  let acc = {xa, ya, za}
+  let pos' = vec_add(pos, vec_mult_factor(time_step, vel))
+  let vel' = vec_add(vel, vec_mult_factor(time_step, acc))
+  let {xp', yp', zp'} = pos'
+  let {xv', yv', zv'} = vel'
+  in {xp', yp', zp', mass, xv', yv', zv', xa, ya, za}
+  
+fun {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}
+  advance_body_wrap(f32 time_step,
+                    {f32, f32, f32, f32, f32, f32, f32, f32, f32, f32} body,
+                    {f32, f32, f32} accel) =
+  let {xp, yp, zp, m, xv, yv, zv, _, _, _} = body
+  let accel' = vec_mult_factor(m, accel)
+  let {xa', ya', za'} = accel'
+  let body' = {xp, yp, zp, m, xv, yv, zv, xa', ya', za'}
+  in advance_body(time_step, body')
+  
+fun [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}, n]
+  advance_bodies(f32 epsilon,
+                 f32 time_step,
+                 [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}, n] bodies) =
+  let accels = calc_accels(epsilon, bodies)
+  in zipWith(advance_body_wrap(time_step), bodies, accels)
+
+fun [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}, n]
+  advance_bodies_steps(i32 n_steps,
+                       f32 epsilon,
+                       f32 time_step,
+                       [{f32, f32, f32, f32, f32, f32, f32, f32, f32, f32}, n] bodies) =
+  loop (bodies) = for i < n_steps do
+    advance_bodies(epsilon, time_step, bodies)
+  in bodies
+
+fun {[f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n]}
+  main(i32 n_steps,
+       f32 epsilon,
+       f32 time_step,
+       [f32, n] xps,
+       [f32, n] yps,
+       [f32, n] zps,
+       [f32, n] ms,
+       [f32, n] xvs,
+       [f32, n] yvs,
+       [f32, n] zvs,
+       [f32, n] xas,
+       [f32, n] yas,
+       [f32, n] zas) =
+  let bodies = zip(xps, yps, zps, ms, xvs, yvs, zvs, xas, yas, zas)
+  let bodies' = advance_bodies_steps(n_steps, epsilon, time_step, bodies)
+  in unzip(bodies')
+\end{lstlisting}
+
+to
+
+\begin{lstlisting}
+type mass = f32
+type vec3 = (f32, f32, f32)
+type position = vec3
+type acceleration = vec3
+type velocity = vec3
+type body = (position, mass, velocity, acceleration)
+
+fun vec3 vec_add(vec3 v1, vec3 v2) =
+  let (x1, y1, z1) = v1
+  let (x2, y2, z2) = v2
+  in (x1 + x2, y1 + y2, z1 + z2)
+
+fun vec3 vec_subtract(vec3 v1, vec3 v2) =
+  let (x1, y1, z1) = v1
+  let (x2, y2, z2) = v2
+  in (x1 - x2, y1 - y2, z1 - z2)
+
+fun vec3 vec_mult_factor(f32 factor, vec3 v) =
+  let (x, y, z) = v
+  in (x * factor, y * factor, z * factor)
+
+fun f32 dot(vec3 v1, vec3 v2) =
+  let (x1, y1, z1) = v1
+  let (x2, y2, z2) = v2
+  in x1 * x2 + y1 * y2 + z1 * z2
+
+fun velocity accel(f32 epsilon, vec3 pi, f32 mi, vec3 pj, f32 mj) =
+  let r = vec_subtract(pj, pi)
+  let rsqr = dot(r, r) + epsilon * epsilon
+  let invr = 1.0f32 / sqrt32(rsqr)
+  let invr3 = invr * invr * invr
+  let s = mj * invr3
+  in vec_mult_factor(s, r)
+
+fun vec3 accel_wrap(f32 epsilon, body body_i, body body_j) =
+  let (pi, mi, _ , _) = body_i
+  let (pj, mj, _ , _) = body_j
+  in accel(epsilon, pi, mi, pj, mj)
+
+fun position move(f32 epsilon, [body] bodies, body this_body) =
+  let accels = map(fn acceleration (body other_body) =>
+                     accel_wrap(epsilon, this_body, other_body),
+                   bodies)
+  in reduceComm(vec_add, (0f32, 0f32, 0f32), accels)
+
+fun [acceleration] calc_accels(f32 epsilon, [body] bodies) =
+  map(move(epsilon, bodies), bodies)
+
+fun body advance_body(f32 time_step, body this_body) =
+  let (pos, mass, vel, acc) = this_body
+  let pos' = vec_add(pos, vec_mult_factor(time_step, vel))
+  let vel' = vec_add(vel, vec_mult_factor(time_step, acc))
+  let (xp', yp', zp') = pos'
+  let (xv', yv', zv') = vel'
+  in (pos', mass, vel', acc)
+
+fun body advance_body_wrap(f32 time_step, body this_body, acceleration accel) =
+  let (pos, mass, vel, acc) = this_body
+  let accel' = vec_mult_factor(mass, accel)
+  let body' = (pos, mass, vel, accel')
+  in advance_body(time_step, body')
+
+fun [body, n] advance_bodies(f32 epsilon, f32 time_step, [body, n] bodies) =
+  let accels = calc_accels(epsilon, bodies)
+  in zipWith(advance_body_wrap(time_step), bodies, accels)
+
+fun [body, n] advance_bodies_steps(i32 n_steps, f32 epsilon, f32 time_step,
+                                   [body, n] bodies) =
+  loop (bodies) = for i < n_steps do
+    advance_bodies(epsilon, time_step, bodies)
+  in bodies
+
+fun body wrap_body (f32 posx, f32 posy, f32 posz,
+                    f32 mass,
+                    f32 velx, f32 vely, f32 velz,
+                    f32 accx, f32 accy, f32 accz) =
+  ((posx, posy, posz), mass, (velx, vely, velz), (accx, accy, accz))
+
+fun (f32, f32, f32, f32, f32, f32, f32, f32, f32, f32) unwrap_body(body this_body) =
+  let ((posx, posy, posz), mass, (velx, vely, velz), (accx, accy, accz)) = this_body
+  in (posx, posy, posz, mass, velx, vely, velz, accx, accy, accz)
+
+
+
+fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n])
+  main(i32 n_steps,
+       f32 epsilon,
+       f32 time_step,
+       [f32, n] xps,
+       [f32, n] yps,
+       [f32, n] zps,
+       [f32, n] ms,
+       [f32, n] xvs,
+       [f32, n] yvs,
+       [f32, n] zvs,
+       [f32, n] xas,
+       [f32, n] yas,
+       [f32, n] zas) =
+  let bodies  = map(wrap_body, zip(xps, yps, zps, ms, xvs, yvs, zvs, xas, yas, zas))
+  let bodies' = advance_bodies_steps(n_steps, epsilon, time_step, bodies)
+  let bodies'' = map(unwrap_body, bodies')
+   in unzip(bodies'')
+\end{lstlisting}
+
+\subsection{future of type aliasing : type a, b, c = vec3}

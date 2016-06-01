@@ -1,0 +1,172 @@
+To work with type aliases and modules, we need to define the internal
+environment of Futhark during compile time.
+
+Before starting this project, the environment of Futhark could be described like
+this:
+\equation{$Env = Functions$}, where any $\forall Function \in Functions,
+Function : (name, ArgTypes, RetType)$ where both ArgTypes and RetTypes they
+have types $\tau$, which is any type as defined in
+\ref{initialtypegrammar}.\\
+
+It is the goal of this project to expand the environment of Futhark, so that
+\equation{$Env = (Functions, TypeAliases, Signatures, Structures)$}.
+
+TypeAliases, Signatures and Structures are described in their respective
+sections. A structure can be regarded as a structure name, a reference to the
+current total environment and an environment contained in the structure. that $Structure name = (name, Env,  Env_{name})$
+
+\subsection{Interference rules}
+Let us define some environment behaviour of Futhark at compile time.
+If a function definition is defined as this: $Function : fun RetType
+name(ArgTypes) = Expressions$ , then adding a function to the Futhark environment follows the following rule:
+\begin{prooftree}
+  \AxiomC{Env}
+  \AxiomC{name \not\in Functions_{Env}
+    \BinaryInfC{Env $\vdash$ $Function_{name}$ \implies Env' where Env' = Env \cup Function_{name}}
+\end{prooftree}
+
+After expanding Env to contain the three new elements, we can define the
+addition of any of these three elements follow the following rule:
+\begin{prooftree}
+  \AxiomC{Env}
+  \AxiomC{name \not\in Signatures_{Env} \u
+    \BinaryInfC{Env $\vdash$ $Signature_{name}$ \implies Env' where Env' = Env \cup Signature_{name}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{Env}
+  \AxiomC{name \not\in Structures_{Env}
+    \BinaryInfC{Env $\vdash$ $Structure_{name}$ \implies Env' where Env' = Env \cup Structure_{name}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{Env}
+  \AxiomC{name \not\in TypeAliases_{Env}
+    \BinaryInfC{Env $\vdash$ $TypeAlias_{name}$ \implies Env' where Env' = Env \cup TypeAlias_{name}}
+\end{prooftree}
+
+
+\subsection{Accessing types and functions within structures}
+The modules implemented in this project uses variable shadowing.
+When a new structure is defined, \textit{variable shadowing} grants this
+structure access to all previously defined functions, types and modules up until
+the definition of this structure.\\
+
+Accessing types and functions are necessary in two cases: when retrieving a type
+definition from a structure, and when using an
+\textit{Apply}-expression\footnote{An Apply-expression is the application of a
+  function, i.e \texttt{foo(a,b)} in \texttt{let result = foo(a,b) }} in a
+Futhark program.
+
+
+\subsubsection{Chunk-wise parsing of the Futhark program}
+The declarations in a Futhark program are type checked and added to the internal program in
+chunks.
+These chunks are divided by structure declarations.
+
+\begin{figure}
+  \begin{verbatim}
+    type foo = M0.bar
+    structure M0 =
+      struct
+        type bar = int
+      end
+  \end{verbatim}
+  \caption{This is not allowed, because the compiler does not know about M0,
+    when foo is type checked}
+\end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+    structure M0 =
+      struct
+        type bar = int
+      end
+    type foo = M0.bar
+  \end{verbatim}
+  \caption{This is allowed, because the compiler has already checked M0,
+    when foo is being type checked}
+\end{figure}
+
+A structure is not added to the current environment, before it has been parsed
+completely:
+\begin{figure}
+  \begin{verbatim}
+  structure M0 =
+    struct
+      type foo = int
+      type bar = M0.foo
+    end
+  \end{verbatim}
+\end{figure}
+The code above will return an \texttt{UndefinedStructure} error, as M0 has not
+been added to the environment when bar is attempted to be resolved}
+
+If the compiler encounters a reference to a value that has not yet been defined
+in the local environment, it will attempt to resolve the reference in the
+toplevel environment.
+
+Look at the following example:
+
+\begin{figure}
+\begin{verbatim}
+structure M0 =
+  struct
+    type foo = f32
+  end
+
+structure M1 =
+  type bar = M0.foo
+  structure M0 =
+    struct
+      type foo = int
+    end
+  type baz = M0.foo
+  end
+\end{verbatim}
+  \caption{The identifier M0 can refer to two different structures}
+\end{figure}
+Type \texttt{bar} has the type \texttt{f32}, whilst \texttt{baz} has the type
+\texttt{int}.
+This is because \texttt{bar} does not know about \texttt{M1s} nested structure
+\texttt{M0}, as opposed to \texttt{baz}, which does.
+
+\begin{verbatim}
+type foo = {int, f32}
+
+structure M0 =
+  struct
+    type foo = foo -- the type is defined from l. 1
+    type bar = f32
+  end
+
+structure M1 =
+  struct
+    type foo = f32
+    type bar = M0.bar -- type is defined from l.6
+
+    structure M0 =
+      struct
+        type foo = M0.foo -- is defined at l. 5
+        type bar = {int, int, int}
+      end
+
+    type baz = M0.bar -- defined at line 17
+  end
+
+type baz = M1.bar -- is defined at l. 13
+\end{verbatim}
+
+\subsection{Module access and variable shadowing}
+
+Comments:
+\begin{itemize}
+  \item 2-4: It is allowed to use the same idenfitier several times in a
+    program, as long as they are not used for the same construction; i.e.
+    \begin{verbatim}
+      type foo = ...
+      fun f32 foo = ...
+    \end{verbatim} is allowed, as functions and types are not read to the same
+    table internally during compilation.
+  \end{itemize}
+

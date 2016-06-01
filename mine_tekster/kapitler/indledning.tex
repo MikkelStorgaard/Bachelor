@@ -1,10 +1,10 @@
 \subsection{Abstract}
 \label{subsec:abstract}
-
+mere bedre
 
 \section{Introduction}
 \label{sec:introduction}
-
+mere bedre
 
 \subsection{Problem definition}
 \label{subsec:probdef}
@@ -12,16 +12,24 @@ Is it possible to implement a module system in Futhark, which displays features
 comparable to the module system implemented in Standard ML? \cite{sml modules}
 %% sml-henvisninger fra bogen måske?
 
-\subsection{Motivation}
+\section{Motivation}
 \label{subsec:label}
 The implementation of a module system, will greatly expand the usability of
 Futhark, without having side effects on the performance of the compiled Futhark code.
-\subsubsection{Futhark usability and portability}
-\label{subsec:usability}
-To be able to claim, that modules increases usability, we must first
-setup some definitions of usability.
+The following subsections contain the features this project is implementing, and
+examples of why these features are desirable.\\
 
-\textbf{Abstraction increases readability.} In example, type aliasing lets us abstract
+To be able to claim, that modules increases usability, we must first
+setup some metrics of usability.
+
+\textbf{Readability increases usability:}\\
+%% skriv mere her
+\textbf{Compartmentalization of functionality increases usability:}\\
+%% skriv mere her
+\textbf{A module system increases the ability to share code between developers.}
+%% skriv mere her
+
+\subsection{Abstraction increases readability.} In example, type aliasing lets us abstract
 from the actual definition of data types.
 When writing our source code, we can define our type aliases before writing the
 rest of our program.
@@ -65,6 +73,7 @@ The end result is a shorter, more readable program. %% se bilag sphere test
 
 
 \textbf{Module language allows for better compartmentalizing and code sharing} \\
+\\label{subsec:modulesaregood}
 Without modules, every function and type in futhark shares the same scope.
 Implementing modules lets us create functions that are alike, but keeps
 distinctions between them.
@@ -133,24 +142,77 @@ language, as the ones displayed in other languages like Standard
 ML\cite{sml_standard_lib} or Python\cite{python3_docs}.
 
 %% mere her
-
-
-
 %% this is elaborated on during the scope
 The function calls \texttt{let res = best_function(arg)} and
 \texttt{let res = MyModule.best_function(arg)} are calls to two difference
 functions.
 
+\subsection{Approximating higher order functionality whilst keeping performance}
+\label{subsec:higherorderfunctionality}
+It is possible to express higher-order functionality in Futhark, without taking
+a performance hit in the compiled Futhark code.
+%% reference to slow higher order functionality
+We will reiterate on the concept of modules\ref{modulesaregood}, by introducing
+the concept of functors.
+First we repeat the three-dimensional vector module
+from earlier, but without declaring any particular
+primitive\ref{typedefinitions} type as the contained type of the vector:
+\begin{verbatim}
+  structure Vec3 = 
+    struct
+      type vector = {t, t, t}
+      fun vector add( ... ) = ...
+      fun vector subtract( ... ) = ...
+      fun vector multiply ( ... ) = ...
+      fun vector divide ( ... ) = ...
+    end
+\end{verbatim}
 
+The structure above cannot be used on its own. Type \texttt{t} is not
+instantiated, and the module cannot be type checked, which causes an error.
 
-\subsubsection{Achieving higher order functionality whilst keeping up performance}
-\label{subsec:label}
-%% reference to 
+We can solve that problem, by instantiating the abstract structure, using a
+simple functor; the \texttt{where}-clause.
+\begin{verbatim}
+  structure IntVec3 = Vec3 where type t = int
+\end{verbatim}
+We can now access the structure \texttt{IntVec3} throughout the rest of the
+program. The structure \texttt{IntVec3} is \texttt{Vec3}, except all instances
+of type \texttt{t} in \texttt{Vec3} is exchanged with type \texttt{int}.
 
-\subsubsection{Inspiration from Standard ML}
+To recap: functors allows us to define an abstract implementation of some
+structure \textbf{ONCE}, and lets us instantiate this structure any number of
+times, each time with our own type.
+
+This functionality will be elaborated on in a later section\ref{functors}. 
+
+From a performance-concerned point of view, the module system is desirable.
+Every function in the written program, whether it is inside a structure
+or defined in the top level program, is ultimately accumulated into the same
+scope.
+
+No matter how complex the written Futhark program is, module use and all, the
+internalised\footnote[]{The internal representation of the Futhark program
+  within the compiler} Futhark program keeps every function in the same table.
+
+The entire program is then compiled, and the optimizations that makes FUTHARK \texttt{GO
+FAST } are applied to the included modules as well as the top level declarations.
 
 \subsection{Scope of project}
-\label{subsec:label}
+\label{subsec:project_scope}
+The scope of the project is
+\begin{itemize}
+  \item to implement a type aliasing system in Futhark
+  \item to implement a module system in Futhark, which has:
+    \begin{itemize}
+      \item The definition of structures containing types and functions
+      \item Nested modules; meaning that any structure can contain a structure
+      \item A well defined way of referring to types, structures and functions
+        contained in a structure
+    \end{itemize}
+  \item to implement functor functionality, so that Futhark supports the
+    definition of abstract structures and concretizations of these structures.
+\end{itemize}
 
 \subsection{Success definitions}
 \label{subsec:label}

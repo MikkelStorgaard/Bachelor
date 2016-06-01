@@ -6,6 +6,8 @@
     "sec:introduction"
     "subsec:probdef"
     "subsec:label"
-    "subsec:usability"))
+    "subsec:modulesaregood"
+    "subsec:higherorderfunctionality"
+    "subsec:project_scope"))
  :latex)
 
