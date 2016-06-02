@@ -85,7 +85,7 @@ A type alias $alias_i$ declaration is succesful, if three rules are followed:
     rules is obeyed:
   
     
-  \item The alias being resolved cannot be cyclically defined.
+  \item The alias being resolved cannot be cyclically defined.\label{cyclicaldefinitionerror}
     Imagine that some type \texttt{type my_type = foo} is in the chain in the
     type aliasing example\ref{longchain} above.\\
 
@@ -149,7 +149,95 @@ data UserType vn = UserPrim PrimType SrcLoc
 The parser was changed, so type declarations in Futhark source would now be parsed as UserTypes and not
 typebases.
 
-\\ faktiske implementering
+\subsubsection{Adding resolved types to scope}\label{typealiasingcode}
+\begin{lstlisting}[language=Haskell, numbers=left]
+  type TypeAliasTableM =
+  ReaderT (HS.HashSet LongName) (StateT Scope TypeM)
+
+typeAliasTableFromProg :: [TypeDefBase NoInfo VName]
+                       -> Scope
+                       -> TypeM Scope
+typeAliasTableFromProg defs scope = do
+  checkForDuplicateTypes defs
+  execStateT (runReaderT (mapM_ process defs) mempty) scope
+  where
+        findDefByName name = find ((==name) . typeAlias) defs
+
+        process :: TypeDefBase NoInfo VName
+                -> TypeAliasTableM (StructTypeBase VName)
+        process (TypeDef name (TypeDecl ut NoInfo) _) = do
+          t <- expandType typeOfName ut
+          modify $ (addType name t)
+          return t
+
+        typeOfName :: LongName -> SrcLoc
+                   -> TypeAliasTableM (StructTypeBase VName)
+        typeOfName (prefixes, name) loc = do
+          inside <- ask
+          known <- get
+          case typeFromScope (prefixes, name) known of
+            Just t -> return t
+            Nothing
+              | (prefixes, name) `HS.member` inside ->
+                  throwError $ CyclicalTypeDefinition loc name
+              | Just def <- findDefByName name ->
+                  local (HS.insert (prefixes, name)) $ process def
+              | otherwise ->
+                  throwError $ UndefinedAlias loc name
+\end{lstlisting}
+
+TypeAliasTableM is a monad stack that is used to resolve a list of type alias
+declarations in a declaration chunk. \\
+It is a reader monad transformer that contains a state monad transformer, that
+contains the TypeM monad.
+
+The reader monad is used to contain a HashSet as its environment. This
+environment is used to keep check of cyclical definitions as described in
+\ref{cyclicaltypedefinition}.
+
+For each type alias, we use the function \texttt{process} to resolve the type, and modify
+the scope contained within the state monad of the ReaderT.
+
+Resolving a type from a type aliasing is done using the function typeOfName in
+the code snippet\ref{typealiasingcode}. typeOfName tries to
+resolve the type by name by retrieving the scope contained in the transformed
+State monad inside the reader. If this is not immediately possible, we must
+either continue our search for the type, throw an error due to a cyclical type
+definition, or throw an error because the type alias has not been defined yet.
+
+If our attempt to resolve $alias_n$ leads to another alias
+$alias_{n+1}$\footnote{line 27-33}, we add
+$alias_n$ to our reader environment using the function \texttt{local}, and
+process $alias_{n+1}$ instead.
+
+\textit{Acknowledgement}: The initial design of expandType and the addition of
+type aliases to the scope was initially much larger, but was reduced in size by
+Troels Henriksen, who rewrote the process to use monads, and reduced some code
+duplication. 
+
+\subsubsection{Converting UserType to TypeBase}
+\begin{lstlisting}[language=Haskell, numbers=left]
+expandType :: (Applicative m, MonadError TypeError m) =>
+               (LongName -> SrcLoc -> m (StructTypeBase VName))
+            -> UserType VName
+            -> m (StructTypeBase VName)
+
+expandType look (UserTypeAlias longname loc) =
+  look longname loc
+expandType _ (UserPrim prim _) =
+  return $ Prim prim
+expandType look (UserTuple ts _) =
+  Tuple <$> mapM (expandType look) ts
+expandType look (UserArray t d _) = do
+  t' <- expandType look t
+  return $ arrayOf t' (ShapeDecl [d]) Nonunique
+expandType look (UserUnique t loc) = do
+  t' <- expandType look t
+  case t' of
+    Array{} -> return $ t' `setUniqueness` Unique
+    _       -> throwError $ InvalidUniqueness loc $ toStructural t'
+\end{lstlisting}
+
 \subsubsection{Why we added UserType instead of extending TypeBase}
 Adding UserType and then resolving these into TypeBases whilst running the
 program through the TypeChecker, removes the need of handling UserAliases after
@@ -160,11 +248,34 @@ can actually be claimed already at program parse time.
 Some information about i.e. IKKE SIKKER HER array dimensionality in regards to aliased arrays, is decided within the type
 checker as well. 
 
+\subsubsection{The slip from type aliases to realized types}
+Since every type alias is resolved in the type checker, the UserTypes are not
+used after the type check.
 
+The data type for a type declaration is this:
+\begin{lstlisting}[language=Haskell]
+data TypeDeclBase f vn =
+  TypeDecl { declaredType :: UserType vn
+                             -- ^ The type declared by the user.
+           , expandedType :: f (StructTypeBase vn)
+                             -- ^ The type deduced by the type checker.
+           }
+\end{lstlisting}
 
-\subsubsection{the slip from type aliases to realized types}
-\subsection{results}
-\subsubsection{example of planet simulations being simplified by type aliases}
+An unresolved type looks like this:\\
+\indent \texttt{TypeDecl userType NoInfo}
+After resolve, NoInfo has been filled out with a variable of type \texttt{Info
+  TypeBase}, giving us the following TypeDecl:\\
+\indent \texttt{TypeDecl usertype Info typebase}.
+
+At any point after the type check, only the expandedType of TypeDecl is used.
+
+\subsection{Results}
+The addition of type aliases works without any issues.
+To verify this, Futhark has been tested to pass all of the tests in futharks
+test suite\footnote{located in folder \texttt{futhark/data/tests}}.
+
+\subsubsection{Example of planet simulations being simplified by type aliases}
 A nice example of the benefits of type aliasing, is the N-body simulation
 (\texttt{nbody}), which is a simulation over the n-body
 problem\footnote{\href{https://en.wikipedia.org/wiki/N-body_problem}}.
@@ -419,4 +530,15 @@ fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
    in unzip(bodies'')
 \end{lstlisting}
 
-\subsection{future of type aliasing : type a, b, c = vec3}
+\subsection{Future of type aliasing}
+An obvious way of enhancing the type aliasing in Futhark would be to allow for
+multiple type alias declarations on the same line; ie:
+type vec3, velocity, position = {f32 , f32 , f32}
+
+This should be doable, by simply treating the line as a list of declarations, so
+the line above would be treated as the following lines internally instead:
+\begin{verbatim}
+type vec3 = {f32, f32, f32}
+type velocity = {f32, f32, f32}
+type position = {f32, f32, f32}
+\end{verbatim}

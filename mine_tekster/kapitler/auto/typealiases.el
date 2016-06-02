@@ -3,6 +3,8 @@
  (lambda ()
    (LaTeX-add-labels
     "longchain"
+    "cyclicaldefinitionerror"
+    "typealiasingcode"
     "typeclarification"))
  :latex)
 
