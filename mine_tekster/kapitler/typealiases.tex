@@ -1,6 +1,6 @@
 \section{Type aliases}
 %% introduction
-\subsection{the language}
+\subsection{The language}
 The initial type system in Futhark supported the following type definitions:
 \begin{align*}
   Type           & = & Primitive type
@@ -36,27 +36,58 @@ Implementing type aliases expands our type constructions as following:
                  & | & Boolean \\
   \\
   \\
-  TypeAlias      & : & string
+  TypeAlias      & :: & { TypeAliasDeclaration } \\
+                 & :  & type strid = Type \\
+                 & |  & type Strids = Type \\
+  \\
+  \\
+  Strids         & :  & strid , Strids \\
+                 & |  & strid \\
 \end{align*}
+where $strid$ is short for \textit{string id}, a string identifier.
 
 \subsection{rules (SAT-like mapping }
 A type alias in a Futhark program is done like this:\\
-\indent \texttt{type} \textit{name} \texttt{=} \textit{Type} , where Type is as
-defined in the grammar above.
-\subsection{Implementation}
-A type alias $alias_i$ declaration is succesful, if three rules are followed:
+\indent \texttt{type} \textit{Strids} \texttt{=} \textit{Type} \\
+, where Type is as defined in the grammar above.
+
+Given an environment $\Gamma : (Functions, Types), Types = { strid \to type }$,
+we can define the following interference rules for using type aliases:
+
+\begin{prooftree}
+  \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
+    \UnaryInfC{$\Gamma \vdash$ \texttt{type} \textit{strid }\texttt{=}
+      \textit{Type} $\to$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
+      \Gamma'
+      \}$}
+\end{prooftree}
+where
+$ \{strid \to Type\} \oplus \Gamma = \Gamma := (Functions_{\Gamma},
+Types_{\Gamma} \cup {\strid \to Type}) $ iff the type alias declaration does not
+clash with the current environment. There is no clash, if the declaration obeys
+the three rules in the implementation subsection\ref{typealiasimplementation}
+
+\begin{prooftree}
+  \AxiomC{$\Gamma \vdash typedecls \Rightarrow \Gamma ' $}
+  \AxiomC{Strids = $strid_1 , ... , strid_n$ }
+    \BinaryInfC{ $\Gamma \vdash$ \texttt{type} \textit{Strids}\texttt{=}
+      \textit{Type} $\to$ $\{ strid_1 \to Type, .. , strid_n \to Type \} \oplus \Gamma \Rightarrow \Gamma' \}$}
+\end{prooftree}
+
+\subsection{Implementation}\label{typealiasimplementation}
+A type alias $strid_i \to Type$ declaration is succesful, if three rules are followed:
 \begin{enumerate}
-  \item The alias $alias_i$ is not already declared\footnote[]{This is by convention of
+  \item The alias $strid_i$ is not already declared\footnote[]{This is by convention of
       only being able to define a value \textit{once}} in the current local
-    scope. I.e. the example below:
+    environment. I.e. the example below:
     \begin{verbatim}
       type foo = i32
       type foo = f32
     \end{verbatim}
     
-  \item The alias $alias_i$ refers to a type (or a type alias), that is either already
+  \item The alias $strid_i$ refers to a type (or a type alias), that is either already
     defined in the current environment (including structure environments), or is
-    in the same declaration chunk as $alias_i$. In the example below, \texttt{foo} refers
+    in the same declaration chunk as $strid_i$. In the example below, \texttt{foo} refers
     to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.
     Therefore, \texttt{foo} can be resolved by resolving \texttt{bar}. The implementation of this
     described in a later subsection\ref{typealiascode}.
@@ -102,12 +133,8 @@ A type alias $alias_i$ declaration is succesful, if three rules are followed:
 
     If so, the compiler returns an error.
     The implementation of this can be read here\ref{typealiasimplementation}
-
-    
 \end{enumerate}
 \subsection{Parsing a type alias}
-
-
 \subsubsection{Data types for describing a type}
 Initially, the types parsed in a Futhark program were always represented as instances of the
 following datatype \texttt{TypeBase}:
@@ -205,10 +232,10 @@ State monad inside the reader. If this is not immediately possible, we must
 either continue our search for the type, throw an error due to a cyclical type
 definition, or throw an error because the type alias has not been defined yet.
 
-If our attempt to resolve $alias_n$ leads to another alias
-$alias_{n+1}$\footnote{line 27-33}, we add
-$alias_n$ to our reader environment using the function \texttt{local}, and
-process $alias_{n+1}$ instead.
+If our attempt to resolve $strid_a$ leads to another alias
+$strid_b$\footnote{line 27-33}, we add
+$strid_a$ to our reader environment using the function \texttt{local}, and
+process $alias_b$ instead.
 
 \textit{Acknowledgement}: The initial design of expandType and the addition of
 type aliases to the scope was initially much larger, but was reduced in size by
@@ -236,6 +263,7 @@ expandType look (UserUnique t loc) = do
   case t' of
     Array{} -> return $ t' `setUniqueness` Unique
     _       -> throwError $ InvalidUniqueness loc $ toStructural t'
+
 \end{lstlisting}
 
 \subsubsection{Why we added UserType instead of extending TypeBase}
@@ -274,6 +302,55 @@ At any point after the type check, only the expandedType of TypeDecl is used.
 The addition of type aliases works without any issues.
 To verify this, Futhark has been tested to pass all of the tests in futharks
 test suite\footnote{located in folder \texttt{futhark/data/tests}}.
+
+However, it was also necessary to write tests to specifically confirm, that the
+implementation respects the rules defined in \ref{typealiasimplementation}
+
+\subsubsection{A type cannot be defined twice in the same environment}
+From \texttt{alias-error3.fut} in \texttt{futhark/src/data/tests/types}:
+\begin{verbatim}
+-- You may not define the same alias twice.
+--
+-- ==
+-- error: Duplicate.*mydup
+
+type mydup = int
+type mydup = f32
+
+fun int main(int x) = x
+\end{verbatim}
+
+This program fails as expected.
+
+\subsubsection{A type alias cannot be defined, if it refers to a type alias that has not been defined}
+From \texttt{alias-error4.fut} in \texttt{futhark/src/data/tests/types}:
+\begin{verbatim}
+-- No undefined types!
+--
+-- ==
+-- error: .*not defined.*
+
+type foo = bar
+
+fun foo main(foo x) = x
+\end{verbatim}
+This program fails as expected.
+
+\subsubsection{A type alias cannot be cyclically defined}
+From \texttt{alias-error5.fut} in \texttt{futhark/src/data/tests/types}:
+\begin{verbatim}
+-- No tricky circular types!
+--
+-- ==
+-- error: .*cycl.*
+
+type t0 = [t1]
+type t1 = {int, float, t2}
+type t2 = t0
+
+fun t1 main(t1 x) = x
+\end{verbatim}
+This program fails as expected.
 
 \subsubsection{Example of planet simulations being simplified by type aliases}
 A nice example of the benefits of type aliasing, is the N-body simulation
@@ -428,9 +505,8 @@ to
 \begin{lstlisting}
 type mass = f32
 type vec3 = (f32, f32, f32)
-type position = vec3
-type acceleration = vec3
-type velocity = vec3
+type position, acceleration, velocity = vec3
+
 type body = (position, mass, velocity, acceleration)
 
 fun vec3 vec_add(vec3 v1, vec3 v2) =
@@ -529,16 +605,3 @@ fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
   let bodies'' = map(unwrap_body, bodies')
    in unzip(bodies'')
 \end{lstlisting}
-
-\subsection{Future of type aliasing}
-An obvious way of enhancing the type aliasing in Futhark would be to allow for
-multiple type alias declarations on the same line; ie:
-type vec3, velocity, position = {f32 , f32 , f32}
-
-This should be doable, by simply treating the line as a list of declarations, so
-the line above would be treated as the following lines internally instead:
-\begin{verbatim}
-type vec3 = {f32, f32, f32}
-type velocity = {f32, f32, f32}
-type position = {f32, f32, f32}
-\end{verbatim}
