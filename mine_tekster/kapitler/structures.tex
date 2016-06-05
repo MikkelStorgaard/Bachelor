@@ -61,16 +61,22 @@ implementation \footnote{By including libraries that adds functions to the top
   defined}, if any of the library functions uses any of the names, that the
 local user is using as well.
 
-The module system removes this hazard, as names from an imported module
-\texttt{Foo} are accessed through its \textbf{longname}, as shown in function
-\texttt{foo} in the example above.
-\\
-A longname consists of any amount of prefixes followed by a dot, followed by the
-name of the desired function or type.
-
 An obvious use case is including a library of standard modules with the Futhark
 language, as the ones displayed in other languages like Standard
 ML\cite{sml_standard_lib} or Python\cite{python3_docs}.
+
+The module system removes this hazard, as application of functions and types are
+done using \textbf{longnames}, which adds prefixes to names. This way, functions
+can have the same name, as long as they do not share the same prefix.
+
+\begin{tcolorbox}
+\textbf{Longnames:}\\
+A longname consists of any amount of prefixes followed by a dot, followed by the
+string id of the desired function or type.
+
+In Futhark we will be using string ids for declarations, and longnames for
+the accessing types and functions in structures.
+\end{tcolorbox}
 
 %% mere her
 %% this is elaborated on during the scope
@@ -80,14 +86,6 @@ The structures implemented in this project uses variable shadowing.
 When a new structure is defined, \textit{variable shadowing} grants this
 structure access to all previously defined functions, types and modules up until
 the definition of this structure.\\
-
-Accessing types and functions are necessary in two cases: when retrieving a type
-definition from a structure, and when using an
-\textit{Apply}-expression\footnote{An Apply-expression is the application of a
-  function, i.e \texttt{foo(a,b)} in \texttt{let result = foo(a,b) }} in a
-Futhark program.
-
-\subsection{Working with the Futhark environment}
 
 To work with type aliases and modules, we need to define the internal
 environment of Futhark during compile time.
@@ -154,10 +152,10 @@ We must take a closer look at what happens, when a structure is defined:
 Defining a 
 \begin{prooftree}
   \AxiomC{ $\Gamma_{local} \vdash structdef_{strid} \Rightarrow \Gamma_{local}'$ }
-  \AxiomC{ $\{ structdef_{strid} \to structdecls_{strid} \}$}
+  \AxiomC{ $\{ structdef_{strid} \to structdecls_{strid} \}$ }
     \BinaryInfC{$\Gamma_{local} \vdash$ \texttt{struct} \textit{strid}
-      \texttt{=} \textit{declarations} \textit{end}
-      $\Rightarrow$
+      \texttt{=} \textit{declarations} \textit{end} \\
+      $\Rightarrow$ \\
       $\Gamma_{strid} = \Gamma_{local} \oplus structdecls_{strid};$ \\
       $\Gamma_{local}' = \Gamma_{strid} \oplus \Gamma_{local} $  } 
 \end{prooftree}
@@ -222,12 +220,31 @@ where $\oplus$ is any operation between two expressions in a Futhark function.
 
 where $\Gamma \oplus declarations_{strid}$ builds an environment
 $\Gamma_{strid}$, from $declarations_{strid}$ interpreted in the environment
-$\Gamma$. Interference rules for interpreting function and type declarations are
+$\Gamma$. Interference rules for accessing function and type declarations are
 described below\ref{interpretingfunctionsandtypeswithstructures}.
 
 \subsection{Interference rules for interpreting functions and types in an
   environment with structures}\label{interpretingfunctionsandtypeswithstructures}
-To be 
+There are three cases where it is necessary to resolve a function or a type from a
+longname:\\
+
+1) When applying a function as an expression in a function expression; i.e.
+\begin{verbatim}
+  let myNumber = Constants.numberFour()
+\end{verbatim}
+
+2) When using a function as an argument in a currying function; i.e.
+\begin{verbatim}
+  let numbers = [1, 2, 3, 4] in
+  let sum = reduce(MathLib.plus , 0 , numbers)
+\end{verbatim}
+
+2) When using a function as an argument in a currying function; i.e.
+\begin{verbatim}
+  let numbers = [1, 2, 3, 4] in
+  let sum = reduce(MathLib.plus , 0 , numbers)
+\end{verbatim}
+
 
 %% \oplus if longname is defined in \gamma_local then longname \oplus \Gamma_local
 %%          else longname \oplus \Gamma        

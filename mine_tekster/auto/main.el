@@ -19,6 +19,7 @@
     "pgffor"
     "amssymb"
     "listings"
+    "tcolorbox"
     "amsmath"
     "inputenc"
     "dsfont"
