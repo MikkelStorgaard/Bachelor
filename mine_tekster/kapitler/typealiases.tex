@@ -1,5 +1,9 @@
 \section{Type aliases}
-%% introduction
+To make an implementation of functors\ref{functors} in Futhark, it was necessary
+to implement type aliases first.
+
+
+
 \subsection{The language}
 The initial type system in Futhark supported the following type definitions:
 \begin{align*}
@@ -51,19 +55,18 @@ A type alias in a Futhark program is done like this:\\
 \indent \texttt{type} \textit{Strids} \texttt{=} \textit{Type} \\
 , where Type is as defined in the grammar above.
 
-Given an environment $\Gamma : (Functions, Types), Types = { strid \to type }$,
+\label{typealiasinterference}Given an environment $\Gamma : (Functions, Types), Types = { strid \to type }$,
 we can define the following interference rules for using type aliases:
 
 \begin{prooftree}
   \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
     \UnaryInfC{$\Gamma \vdash$ \texttt{type} \textit{strid }\texttt{=}
-      \textit{Type} $\to$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
+      \textit{Type} $\RightArrow$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
       \Gamma'
       \}$}
 \end{prooftree}
 where
-$ \{strid \to Type\} \oplus \Gamma = \Gamma := (Functions_{\Gamma},
-Types_{\Gamma} \cup {\strid \to Type}) $ iff the type alias declaration does not
+$ \{ strid \to Type \} \oplus \Gamma = \Gamma := Types_{\Gamma} \cup \{strid \to Type\} $ iff the type alias declaration does not
 clash with the current environment. There is no clash, if the declaration obeys
 the three rules in the implementation subsection\ref{typealiasimplementation}
 
@@ -71,7 +74,7 @@ the three rules in the implementation subsection\ref{typealiasimplementation}
   \AxiomC{$\Gamma \vdash typedecls \Rightarrow \Gamma ' $}
   \AxiomC{Strids = $strid_1 , ... , strid_n$ }
     \BinaryInfC{ $\Gamma \vdash$ \texttt{type} \textit{Strids}\texttt{=}
-      \textit{Type} $\to$ $\{ strid_1 \to Type, .. , strid_n \to Type \} \oplus \Gamma \Rightarrow \Gamma' \}$}
+      \textit{Type} $\Rightarrow$ $\{ strid_1 \to Type, .. , strid_n \to Type \} \oplus \Gamma \Rightarrow \Gamma' \}$}
 \end{prooftree}
 
 \subsection{Implementation}\label{typealiasimplementation}
@@ -605,3 +608,13 @@ fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
   let bodies'' = map(unwrap_body, bodies')
    in unzip(bodies'')
 \end{lstlisting}
+
+\subsection{Future work}
+To make functors work, it must be possible to declare an abstract type alias in
+a structure.
+
+That will allow for a structure definition, where a type variable\footnote[]{in
+  the form of a \textit{strid}} has been declared, but not defined, until the
+containing structure is instantiated using a functor.
+
+This has not been implemented yet.

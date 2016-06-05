@@ -2,6 +2,8 @@
  "typealiases"
  (lambda ()
    (LaTeX-add-labels
+    "typealiasinterference"
+    "typealiasimplementation"
     "longchain"
     "cyclicaldefinitionerror"
     "typealiasingcode"
