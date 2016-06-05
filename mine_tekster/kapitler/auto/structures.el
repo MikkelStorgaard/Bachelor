@@ -4,7 +4,7 @@
    (LaTeX-add-labels
     "sec:structures"
     "subsec:structuresaregood"
-    "arbitrarilynestedstructure"
+    "structure_rule"
     "interpretingfunctionsandtypeswithstructures"))
  :latex)
 

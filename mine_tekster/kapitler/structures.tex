@@ -82,10 +82,6 @@ the accessing types and functions in structures.
 %% this is elaborated on during the scope
 
 \subsection{Accessing types and functions within structures}
-The structures implemented in this project uses variable shadowing.
-When a new structure is defined, \textit{variable shadowing} grants this
-structure access to all previously defined functions, types and modules up until
-the definition of this structure.\\
 
 To work with type aliases and modules, we need to define the internal
 environment of Futhark during compile time.
@@ -110,6 +106,8 @@ $Gamma_{env}$ refers to the global environment at the given point in program
 parsing.
 $Gamma_{local}$ refers to the environment, that we are currently working in.
 
+
+
 \subsection{Interference rules}
 Now that we can discern between the glocal environment, and any number of
 environments in structures, we must redefine the environment behaviour of Futhark at compile time.
@@ -127,8 +125,7 @@ $fundef : fun RetType strid ArgTypes = Expressions$
   \\
 where $fundef_{name} \oplus \Gamma_{local} = \Gamma_{local} := (Functions_{\Gamma_{local}} \cup {\strid \to
   fundef \})$
-  iff the function is not already defined in $\Gamma_{local}$, and the
-  function body is otherwise well-formed\footnote[]{I will not go further into
+  iff the function the function body is otherwise well-formed\footnote[]{I will not go further into
     the functionality of functions, as it is not within scope of this project.}.
 
 After expanding the environment to contain the three new elements, we can define the
@@ -146,10 +143,10 @@ Types_{\Gamma} \cup \{strid \to Type\}$ as defined in
 
 The operations $structure_{strid} \oplus \Gamma_{local}$ and $signature_{strid} \oplus \Gamma_{local}$ are defined similarly to $fundef_{name} \oplus \Gamma$.
 
-We must take a closer look at what happens, when a structure is defined:
 
-\subsubsection{Interference rules for structure definitions}
-Defining a 
+\subsection{Interference rules for structure definitions}
+We must take a closer look at what happens, when a structure is defined:
+The definition of a structure in Futhark has the following behaviour:\label{structure_rule}
 \begin{prooftree}
   \AxiomC{ $\Gamma_{local} \vdash structdef_{strid} \Rightarrow \Gamma_{local}'$ }
   \AxiomC{ $\{ structdef_{strid} \to structdecls_{strid} \}$ }
@@ -157,70 +154,40 @@ Defining a
       \texttt{=} \textit{declarations} \textit{end} \\
       $\Rightarrow$ \\
       $\Gamma_{strid} = \Gamma_{local} \oplus structdecls_{strid};$ \\
-      $\Gamma_{local}' = \Gamma_{strid} \oplus \Gamma_{local} $  } 
-\end{prooftree}
+      $\Gamma_{local}' = \Gamma_{strid} \oplus \Gamma_{local} $
+    } 
+  \end{prooftree}.
+
+\begin{tcolorbox}
+  \textbf{Rule about multiple declarations of same name in same local environment:}\\
+  Building a structure from a list of \textit{structdecls} allows for several
+  different declarations in the same environment of the same name, as long as
+  it is different types of declarations:\\
+  \\
+  For $decl : (name, type) , type \in \{Function, TypeAlias, Structure, Signature \}$:
+  \begin{prooftree}
+    \AxiomC{$\Gamma_{local} \vdash (decl ::\footnote{this is the list
+        constructor operator} decls) \Rightarrow \Gamma_{local}'$ }
+    \UnaryInfC{$\Gamma_{local} \vdash structdecl \Rightarrow structdecl \oplus \Gamma_{local} \Gamma_{local}'$
+  \end{prooftree}
+  where $decl (name, type) \oplus \Gamma_{local}$ adds the declaration to
+  $\Gamma_{local}$ , iff $(name, type) \not\in decls$.
+\end{tcolorbox}
 
 where $\Gamma_{local} \oplus structdecls_{strid}$ builds an environment
 $\Gamma_{strid}$, from $structdecls_{strid}$ interpreted in the environment
-$\Gamma_{local}$.
+$\Gamma_{local}$. If $structdecls_{strid}$ contains a new function, type or
+structure, with a name that is already used in $\Gamma_{local}$, the fun- or
+type definition in $\Gamma_{strid}$ is will be the defined in $structdecls_{strid}$
 \\
 \\
-and $\Gamma_{strid} \oplus \Gamma_{local} = Structures_{\Gamma_{local}} :=
-Structures_{\Gamma_{local}} \cup {strid \to \Gamma_{strid}}$
-
+and
+$\Gamma_{strid} \oplus \Gamma_{local} = Structures_{\Gamma_{local}} := Structures_{\Gamma_{local}} \cup {strid \to \Gamma_{strid}}$ .\\
+Please note, that $\Gamma_{local}$ does not have a reference
+ $Structure\{strid \to \Gamma_{strid}}$, until the entire structure
+  $structdef_{strid}$ has been parsed.
 
 Interference rules for interpreting function and type declarations are
-described below\ref{interpretingfunctionsandtypeswithstructures}.
-
-\subsubsection{Environmental placement of a nested structure}
-As structures can contain other structures, we must define where an arbritrarily deep nested
-structure is placed in its nests.
-\begin{figure}
-  \label{arbitrarilynestedstructure}
-  \begin{verbatim}
-    structure M0 =
-      struct
-        structure M1 =
-          struct
-           ..
-            ..
-             structure Mn =
-               struct
-                 fun int four() = 4
-               end
-          end
-       end
-     end
-  \end{verbatim}
-\caption{An arbitrarily deeply nested structure}
-\end{figure}
-To apply function \texttt{four()} in $M_n$ in
-figure\ref{arbitrarilynestedstructure}, we must access it using a longname.
-
-\texttt{fun eight() = 2 * M0.M1. ... .Mn.four()}
-
-
-\begin{prooftree}
-  \AxiomC{$\Gamma_{env} \vdash$ \texttt{funexp} containing a function application $\Rightarrow$ \texttt{exp}}  }
-  \AxiomC{$structure_{M_n} \in structure\_{...} \in structure_{M_0} \in \Gamma_{env}$}
-  \AxiomC{$four() \in Functions_{\Gamma_{M_n}}$}
-    \TrinaryInfC{$\Gamma_{env} \vdash$ \texttt{exp} $\oplus$ \texttt{M0.M1. ...
-        .Mn.four()} $\Rightarrow$ \texttt{exp} $\oplus$ \texttt{four()}\textsubscript{$M_n$}} 
-\end{prooftree}
-
-where $\oplus$ is any operation between two expressions in a Futhark function.
-
-\subsection{Interference rules for structure definitions}
-\begin{prooftree}
-  \AxiomC{ $\Gamma \vdash structure_{strid}$ }
-  \AxiomC{ $structure_{strid} \Rightarrow (strid, \Gamma, \Gamma_{strid})$}
-    \BinaryInfC{$\Gamma \vdash$ struct strid = declarations $\Rightarrow
-      \Gamma_{strid} = \Gamma \oplus declarations_{strid}; \Gamma_{strid} \oplus \Gamma \Rightarrow \Gamma' $  } 
-\end{prooftree}
-
-where $\Gamma \oplus declarations_{strid}$ builds an environment
-$\Gamma_{strid}$, from $declarations_{strid}$ interpreted in the environment
-$\Gamma$. Interference rules for accessing function and type declarations are
 described below\ref{interpretingfunctionsandtypeswithstructures}.
 
 \subsection{Interference rules for interpreting functions and types in an
@@ -239,17 +206,33 @@ longname:\\
   let sum = reduce(MathLib.plus , 0 , numbers)
 \end{verbatim}
 
-2) When using a function as an argument in a currying function; i.e.
+3) When using a type definition from a structure; i.e.
 \begin{verbatim}
-  let numbers = [1, 2, 3, 4] in
-  let sum = reduce(MathLib.plus , 0 , numbers)
+  type int_pair = Pairs.Int.t 
 \end{verbatim}
 
-
-%% \oplus if longname is defined in \gamma_local then longname \oplus \Gamma_local
-%%          else longname \oplus \Gamma        
+%% MERE BEDRE OM VARIABLE SHADOWING
 
 
+We can define the interference rule for using a longname in the three different
+cases. As all three cases handles resolving a longname the same way, the rule
+will only be called for the first case:
+
+\begin{prooftree}
+  \AxiomC{$(\Gamma_{local}, \Gamma_{env}) \vdash \mathit{longname} \Rightarrow \mathtt{apply} \mathit{function} $}
+  \UnaryInfC{$(\Gamma_{local}, \Gamma_{env}) \vdash let x = longname()
+    \Rightarrow x := \downarrow longname$}
+\end{prooftree}
+
+where
+\begin{align*}
+  \downarrow longname & = & \mathtt{if longname is defined in }\Gamma_{local} \\
+                      &   & \mathtt{  then return getFromEnv(longname, }\Gamma_{local}) \\
+                      &   & \mathtt{else return getFromEnv(longname, }\Gamma_{env})
+\end{align*}.
+
+There is not defined behaviour for the case where a longname is called, that is
+defined in neither the local or global environment.
 \subsubsection{Chunk-wise parsing of the Futhark program}
 The declarations in a Futhark program are type checked and added to the internal program in
 chunks.
@@ -299,54 +282,6 @@ toplevel environment.
 
 Look at the following example:
 
-\begin{figure}
-\begin{verbatim}
-structure M0 =
-  struct
-    type foo = f32
-  end
-
-structure M1 =
-  type bar = M0.foo
-  structure M0 =
-    struct
-      type foo = int
-    end
-  type baz = M0.foo
-  end
-\end{verbatim}
-  \caption{The identifier M0 can refer to two different structures}
-\end{figure}
-Type \texttt{bar} has the type \texttt{f32}, whilst \texttt{baz} has the type
-\texttt{int}.
-This is because \texttt{bar} does not know about \texttt{M1s} nested structure
-\texttt{M0}, as opposed to \texttt{baz}, which does.
-
-\begin{verbatim}
-type foo = {int, f32}
-
-structure M0 =
-  struct
-    type foo = foo -- the type is defined from l. 1
-    type bar = f32
-  end
-
-structure M1 =
-  struct
-    type foo = f32
-    type bar = M0.bar -- type is defined from l.6
-
-    structure M0 =
-      struct
-        type foo = M0.foo -- is defined at l. 5
-        type bar = {int, int, int}
-      end
-
-    type baz = M0.bar -- defined at line 17
-  end
-
-type baz = M1.bar -- is defined at l. 13
-\end{verbatim}
 
 \subsection{Module access and variable shadowing}
 
