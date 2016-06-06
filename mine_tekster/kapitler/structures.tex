@@ -117,78 +117,137 @@ If a function definition is defined as this:
 \\
 $fundef : fun RetType strid ArgTypes = Expressions$
 \\ then adding a function to the Futhark environment follows the following rule:
-\begin{prooftree}
-  \AxiomC{$\Gamma_{local} \vdash fundef \Rightarrow \Gamma_{local}'$}
-    \UnaryInfC{$\Gamma_{local} \vdash fundef_{strid} \Rightarrow \Gamma_{local} \oplus
-      fundef_{strid} \Rightarrow \Gamma_{local}' $ }
-\end{prooftree}
-  \\
-where $fundef_{name} \oplus \Gamma_{local} = \Gamma_{local} := (Functions_{\Gamma_{local}} \cup {\strid \to
-  fundef \})$
-  iff the function the function body is otherwise well-formed\footnote[]{I will not go further into
-    the functionality of functions, as it is not within scope of this project.}.
+
+
+\begin{figure}\label{Rule1}
+  \begin{tcolorbox}
+    \begin{prooftree}
+      \AxiomC{$\Gamma_{local} \vdash fundef \Rightarrow \Gamma_{local}'$}
+      \UnaryInfC{$\Gamma_{local} \vdash fundef_{strid} \Rightarrow \Gamma_{local} \oplus
+        fundef_{strid} \Rightarrow \Gamma_{local}' $ }
+    \end{prooftree}
+
+    where $fundef_{name} \oplus \Gamma_{local} = \Gamma_{local} := (Functions_{\Gamma_{local}} \cup {\strid \to
+      fundef \})$
+    iff the function the function body is otherwise well-formed\footnote[]{I will not go further into
+      the functionality of functions, as it is not within scope of this project.}.
+
+  \end{tcolorbox}
+  \caption{Rule for adding a function to the environment}
+\end{figure}
 
 After expanding the environment to contain the three new elements, we can define the
 addition of any of these three elements follow the following rule:
+\subsubsection{Adding declarations to the environment}\label{normaldecls}
+\begin{figure}\label{Rule2type}
+  \begin{tcolorbox}
 
-\begin{prooftree}
-  \AxiomC{ $\Gamma_{local} \vdash typedecl \Rightarrow \Gamma_{local} ' $ }
-    \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{type} \textit{strid }\texttt{=}
-      \textit{Type} $\RightArrow$ $\{ strid \to Type \} \oplus \Gamma_{local} \Rightarrow
-      \Gamma_{local}'
-      \}$ }
-\end{prooftree} where $\{ strid \to Type \} \oplus \Gamma = \Gamma :=
-Types_{\Gamma} \cup \{strid \to Type\}$ as defined in
-\ref{typealiasinterference}.
+    \begin{prooftree}
+      \AxiomC{ $\Gamma_{local} \vdash typedecl \Rightarrow \Gamma_{local} ' $ }
+      \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{type} \textit{strid }\texttt{=} \textit{Type} $\RightArrow$ $\{ strid \to Type \} \oplus \Gamma_{local} \Rightarrow \Gamma_{local}' \}$ }
+    \end{prooftree} where
+    $\{ strid \to Type \} \oplus \Gamma_{local} = \Gamma_{local} := Types_{\Gamma} \cup \{strid
+    \to Type'\}$ and $Type' := Type resolved in \Gamma_{local}$ as defined in
+    \ref{typealiasinterference}.
+  \end{tcolorbox}
+\end{figure}
 
-The operations $structure_{strid} \oplus \Gamma_{local}$ and $signature_{strid} \oplus \Gamma_{local}$ are defined similarly to $fundef_{name} \oplus \Gamma$.
+\begin{figure}\label{Rule2fun}
+  \begin{tcolorbox}
+    \begin{prooftree}
+      \AxiomC{ $\Gamma_{local} \vdash fundecl \Rightarrow \Gamma_{local} ' $ }
+      \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{fun} \textit{strid }\texttt{=} \textit{Function} $\RightArrow$ $\{ strid \to Function \} \oplus \Gamma_{local} \Rightarrow \Gamma_{local}' \}$ }
+    \end{prooftree} where
+    $\{ strid \to Function \} \oplus \Gamma_{local} = \Gamma_{local} := Functions_{\Gamma} \cup \{strid \to Function\}$ and $Function' := Function resolved in \Gamma_{local}$ as defined in
+    \ref{typealiasinterference}.
+  \end{tcolorbox}
+\end{figure}
 
+\begin{figure}\label{Rule2sig}
+  \begin{tcolorbox}
+    \begin{prooftree}
+      \AxiomC{ $\Gamma_{local} \vdash sigdecl \Rightarrow \Gamma_{local} ' $ }
+      \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{fun} \textit{strid }\texttt{=} \textit{Signature} $\RightArrow$ $\{ strid \to Signature \} \oplus \Gamma_{local} \Rightarrow \Gamma_{local}' \}$ }
+    \end{prooftree} where
+    $\{ strid \to Signature \} \oplus \Gamma = \Gamma := Signatures_{\Gamma} \cup \{strid \to Signature\}$ as defined in
+    \ref{typealiasinterference}.
+    
+    Note, that Signatures should be independently defined, and not refer to any
+    other signatures.
+  \end{tcolorbox}
+\end{figure}
 
 \subsection{Interference rules for structure definitions}
-We must take a closer look at what happens, when a structure is defined:
-The definition of a structure in Futhark has the following behaviour:\label{structure_rule}
-\begin{prooftree}
-  \AxiomC{ $\Gamma_{local} \vdash structdef_{strid} \Rightarrow \Gamma_{local}'$ }
-  \AxiomC{ $\{ structdef_{strid} \to structdecls_{strid} \}$ }
-    \BinaryInfC{$\Gamma_{local} \vdash$ \texttt{struct} \textit{strid}
-      \texttt{=} \textit{declarations} \textit{end} \\
-      $\Rightarrow$ \\
-      $\Gamma_{strid} = \Gamma_{local} \oplus structdecls_{strid};$ \\
-      $\Gamma_{local}' = \Gamma_{strid} \oplus \Gamma_{local} $
-    } 
-  \end{prooftree}.
-
-\begin{tcolorbox}
-  \textbf{Rule about multiple declarations of same name in same local environment:}\\
-  Building a structure from a list of \textit{structdecls} allows for several
-  different declarations in the same environment of the same name, as long as
-  it is different types of declarations:\\
-  \\
-  For $decl : (name, type) , type \in \{Function, TypeAlias, Structure, Signature \}$:
-  \begin{prooftree}
-    \AxiomC{$\Gamma_{local} \vdash (decl ::\footnote{this is the list
-        constructor operator} decls) \Rightarrow \Gamma_{local}'$ }
-    \UnaryInfC{$\Gamma_{local} \vdash structdecl \Rightarrow structdecl \oplus \Gamma_{local} \Gamma_{local}'$
-  \end{prooftree}
-  where $decl (name, type) \oplus \Gamma_{local}$ adds the declaration to
-  $\Gamma_{local}$ , iff $(name, type) \not\in decls$.
-\end{tcolorbox}
-
-where $\Gamma_{local} \oplus structdecls_{strid}$ builds an environment
-$\Gamma_{strid}$, from $structdecls_{strid}$ interpreted in the environment
-$\Gamma_{local}$. If $structdecls_{strid}$ contains a new function, type or
-structure, with a name that is already used in $\Gamma_{local}$, the fun- or
-type definition in $\Gamma_{strid}$ is will be the defined in $structdecls_{strid}$
+We must take a closer look at what happens, when a structure is defined.
+The definition of a structure in Futhark has the following behaviour.
+\subsubsection{Rule for multiple declarations of same name in same local environment:}\\
+Building a structure from a list of \textit{structdecls} allows for several
+different declarations in the same environment of the same name, as long as
+it is different types of declarations:\\
 \\
-\\
-and
-$\Gamma_{strid} \oplus \Gamma_{local} = Structures_{\Gamma_{local}} := Structures_{\Gamma_{local}} \cup {strid \to \Gamma_{strid}}$ .\\
-Please note, that $\Gamma_{local}$ does not have a reference
- $Structure\{strid \to \Gamma_{strid}}$, until the entire structure
-  $structdef_{strid}$ has been parsed.
 
-Interference rules for interpreting function and type declarations are
-described below\ref{interpretingfunctionsandtypeswithstructures}.
+\begin{figure}\label{Rule4}
+  \begin{tcolorbox}
+    For $decl : (name, type) , type \in \{Function, TypeAlias, Structure, Signature \}$:
+    \begin{prooftree}
+      \AxiomC{$\Gamma_{local} \vdash (decl ::\footnote{this is the list
+          constructor operator} decls) \Rightarrow \Gamma_{local}'$ }
+      \UnaryInfC{$\Gamma_{local} \vdash structdecl \Rightarrow structdecl \oplus \Gamma_{local} \Gamma_{local}'$
+    \end{prooftree}
+      where $decl (name, type) \oplus \Gamma_{local}$ adds the declaration to
+      $\Gamma_{local}$ , iff $(name, type) \not\in decls$.
+  \end{tcolorbox}
+\end{figure}
+
+\subsubsection{Rule for adding a structure to the local environment}
+\begin{figure}\label{Rule3}
+  \begin{tcolorbox}
+    \begin{prooftree}
+      \AxiomC{ $\Gamma_{local} \vdash structdecl \Rightarrow \Gamma_{local}'$ }
+      \AxiomC{ $\{ structdecl_{strid} \to decls_{strid} \}$ }
+      \BinaryInfC{$\Gamma_{local} \vdash$ \texttt{struct} \textit{strid}
+        \texttt{=} \textit{Declarations} \textit{end} \\
+        $\Rightarrow$ \\
+        $\Gamma_{strid} = \Gamma_{local} \oplus Declarations;$ \\
+        $\Gamma_{local}' = \Gamma_{strid} \ocross \Gamma_{local} $
+      } 
+    \end{prooftree}.
+
+      where $\Gamma_{local} \oplus structdecls_{strid}$ builds an environment
+      $\Gamma_{strid}$, from $structdecls_{strid}$ interpreted in the environment
+      $\Gamma_{local}$.\\
+      If $structdecls_{strid}$ contains a new function, type or
+      structure, with a name that is already used in $\Gamma_{local}$, the fun- or
+      type definition in $\Gamma_{strid}$ is will be the defined in $structdecls_{strid}$
+      \\
+      \\
+      and
+      $\Gamma_{strid} \ocross \Gamma_{local} = \Gamma_{local} Structures := \Gamma_{local} Structures \cup {strid \to \Gamma_{strid}}$ .\\
+      Please note, that $\Gamma_{local}$ does not have a reference
+      $Structure\{strid \to \Gamma_{strid}}$, until the entire structure $structdef_{strid}$ has been parsed.
+  \end{tcolorbox}
+\end{figure}
+
+\subsubsection{Rule for variable shadowing}
+The following interference rule defines the
+variable shadowing behaviour of the Futhark module system.
+
+\begin{figure}\label{Rule4a}
+  \begin{tcolorbox}
+    For $decl : (name, type) , type \in \{Function, TypeAlias, Structure, Signature \}$:
+    \begin{prooftree}
+      \AxiomC{$\Gamma_{local} \vdash decl_{new} (name, type) \Rightarrow
+        \Gamma_{local}'$ }
+      \AxiomC{$(name, type) \downarrow \Gamma_{local} \to decl_{current} $}
+        \UnaryInfC{$\Gamma_{local} \vdash decl \Rightarrow \Gamma' := decl_{new} \oplus
+          \Gamma$
+    \end{prooftree}
+      where $(name, type) \downarrow \Gamma_{local}$ returns the declaration of
+      (name, type) as defined in $\Gamma_{local}$ \\
+      and $decl_{new} \oplus \Gamma$ replaces the current declaration of (name,
+      type) in $\Gamma_{local}$ 
+  \end{tcolorbox}
+\end{figure}
 
 \subsection{Interference rules for interpreting functions and types in an
   environment with structures}\label{interpretingfunctionsandtypeswithstructures}
@@ -211,88 +270,229 @@ longname:\\
   type int_pair = Pairs.Int.t 
 \end{verbatim}
 
-%% MERE BEDRE OM VARIABLE SHADOWING
-
-
 We can define the interference rule for using a longname in the three different
 cases. As all three cases handles resolving a longname the same way, the rule
 will only be called for the first case:
-
-\begin{prooftree}
-  \AxiomC{$(\Gamma_{local}, \Gamma_{env}) \vdash \mathit{longname} \Rightarrow \mathtt{apply} \mathit{function} $}
-  \UnaryInfC{$(\Gamma_{local}, \Gamma_{env}) \vdash let x = longname()
-    \Rightarrow x := \downarrow longname$}
-\end{prooftree}
-
-where
-\begin{align*}
-  \downarrow longname & = & \mathtt{if longname is defined in }\Gamma_{local} \\
-                      &   & \mathtt{  then return getFromEnv(longname, }\Gamma_{local}) \\
-                      &   & \mathtt{else return getFromEnv(longname, }\Gamma_{env})
-\end{align*}.
-
-There is not defined behaviour for the case where a longname is called, that is
-defined in neither the local or global environment.
-\subsubsection{Chunk-wise parsing of the Futhark program}
-The declarations in a Futhark program are type checked and added to the internal program in
-chunks.
-These chunks are divided by structure declarations.
-
-\begin{figure}
-  \begin{verbatim}
-    type foo = M0.bar
-    structure M0 =
-      struct
-        type bar = int
-      end
-  \end{verbatim}
-  \caption{This is not allowed, because the compiler does not know about M0,
-    when foo is type checked}
+\begin{figure}\label{Rule5}
+  \begin{prooftree}
+    \AxiomC{$\Gamma_{local} \vdash \mathtt{apply} \mathit{longname} \Rightarrow \mathtt{apply} \mathit{function} $}
+    \UnaryInfC{$\Gamma_{local} \vdash let x = longname()
+      \Rightarrow x := \downarrow longname$}
+  \end{prooftree}
+  
+  where
+  \begin{align*}
+    \downarrow longname & = & return getFromEnv(longname, }\Gamma_{local}) \\
+  \end{align*}.
 \end{figure}
 
-\begin{figure}
-  \begin{verbatim}
-    structure M0 =
-      struct
-        type bar = int
-      end
-    type foo = M0.bar
-  \end{verbatim}
-  \caption{This is allowed, because the compiler has already checked M0,
-    when foo is being type checked}
+
+\subsection{Implementation}
+
+A program in the Futhark type checker is defined as a list of unchecked
+declarations.
+
+I will not describe the process in details, but will instead
+explain specific parts of the code.
+I will specifically focus on parts of the code, that corresponds to the
+interference rules described earlier.
+
+
+\subsubsection{The Scope datatype}
+To describe the environment in the Futhark compiler, we use the Scope datatype:
+\begin{verbatim}
+data Scope  = Scope { envVtable :: HM.HashMap VName Binding
+                    , envFtable :: HM.HashMap Name FunBinding
+                    , envTAtable :: HM.HashMap Name TypeBinding
+                    , envModTable :: HM.HashMap Name Scope
+                    , envBreadcrumb :: LongName
+                    }
+\end{verbatim}
+Given $\Gamma = (Functions, TypeAliases, Structures)$, then \textit{Functions} is
+implemented in \texttt{envFtable}, \textit{TypeAliases} in \texttt{envTAtable} and \textit{Structures} in \texttt{envModTable}.
+\subsubsection{checkProg}
+The type check is initiated in the functions checkProg and checkProg'.
+checkProg' checks the initial top level of declaratations for duplicates.
+
+\begin{lstlisting}[language=Haskell]
+  checkProg :: UncheckedProg -> Either TypeError (Prog, VNameSource)
+  checkProg prog = do
+    checkedProg <- runTypeM initialScope src $ Prog <$> checkProg' (progDecs prog')
+    return $ flattenProgFunctions checkedProg
+    where
+      (prog', src) = tagProg' blankNameSource prog
+  
+  checkProg' :: [DecBase NoInfo VName] -> TypeM [DecBase Info VName]
+  checkProg' decs = do
+    _ <- checkForDuplicateDecs decs
+    (_, decs') <- checkDecs decs
+    return decs'
+  
+\end{lstlisting}
+%$
+\subsubsection{Checking for duplicates}
+\label{subsec:checkingforduplicates}
+
+As described in rule \ref{Rule4}, we allow multiple declarations of same name,
+as long as they don't share type:
+In example, checking for two function definitions of the same type is done in
+the first case of checkForDuplicateDecs:
+
+\begin{lstlisting}[language=Haskell]
+checkForDuplicateDecs :: [DecBase NoInfo VName] -> TypeM ()
+checkForDuplicateDecs decs = do
+  _ <- foldM_ f HM.empty decs
+  return ()
+  where
+    f known dec@(FunOrTypeDec (FunDec (FunDef _ (name,_) _ _ _ loc))) =
+      case HM.lookup name known of
+        Just dec'@(FunOrTypeDec (FunDec FunDef{})) ->
+          throwError $ DupDefinitionError name loc $ decLoc dec'
+        _ -> return $ HM.insert name dec known
+\end{lstlisting}
+      %$
+
+\subsection{Dividing a Futhark program into chunks}
+To facilitate variable shadowing, it was necessary to split a parsed Futhark
+program into chunks.
+
+A structure declaration alters the enviroment drastically, by enabling the
+following program declarations following the structure to access the environment
+of the structure.
+Therefore we divide any list of declaration into type- and function
+declarations, and structure declarations.
+An example is given in figure\ref{chunks}
+\begin{figure}\label{chunks}
+  \begin{tcolorbox}
+    \begin{lstlisting}[language=Haskell]
+      fun int four() = 4
+
+      structure M0 =
+        struct
+          fun int double(int a) = a + a
+        end
+
+      fun int main() =
+        let x = four() in
+        M0.double(x, x)
+  \end{lstlisting}
+  \texttt{four()} does not have \texttt{M0} available in its local environment, but
+    \texttt{main()} does, because \texttt{M0} HAS already been parsed, at the point where
+    \texttt{main()} is declared
+  \end{tcolorbox}
 \end{figure}
 
-A structure is not added to the current environment, before it has been parsed
-completely:
-\begin{figure}
-  \begin{verbatim}
-  structure M0 =
-    struct
-      type foo = int
-      type bar = M0.foo
-    end
-  \end{verbatim}
+This chunking is done recursively on a list of declarations:
+\begin{lstlisting}[language=Haskell]
+chompDecs :: [DecBase NoInfo VName]
+          -> ([FunOrTypeDecBase NoInfo VName], [DecBase NoInfo VName])
+chompDecs decs = f ([], decs)
+  where f (foo , FunOrTypeDec dec : xs ) = f (dec:foo , xs)
+        f (foo , bar) = (foo, bar)
+\end{lstlisting}
+
+\subsection{Checking function- and type declarations}
+\label{subsec:checkfunortype}
+
+\begin{lstlisting}[language=Haskell, numbers=left]
+checkDecs :: [DecBase NoInfo VName] -> TypeM (Scope, [DecBase Info VName])
+checkDecs decs = do
+
+    let (funOrTypeDecs, rest) = chompDecs decs
+    scopeFromFunOrTypeDecs <- buildScopeFromDecs funOrTypeDecs
+    local (const scopeFromFunOrTypeDecs) $ do
+      checkedeDecs <- checkFunOrTypeDec funOrTypeDecs
+      (scope, rest') <- checkDecs rest
+      return (scope , checkedeDecs ++ rest')
+
+checkDecs [] = do
+  scope <- ask
+  return (scope, [])
+
+\end{lstlisting}
+% $
+1) The current chunk of declarations is built using chompDecs. \\
+2) A scope is built from this chunk, by using the three interference rules in
+section \ref{normaldecls}.\\
+3) The scope from step 2 is now the local scope in the following function
+execution.\\
+4) checkFunOrTypeDec does the actual typechecking of the function declaration. \\
+5) The remainder of the declarations chunked in chompDecs is checked using
+checkDecs. Note, that the first element of \texttt{rest} must be a structure
+declaration, due to the implementation of chompDecs.
+
+\subsection{Checking structure declarations}
+Please note that structures are currently called modules inside Futharks compiler.
+\begin{lstlisting}[language=Haskell]
+checkDecs (ModDec modd:rest) = do
+  (modscope, modd') <- checkMod modd
+  local (addModule modscope) $
+    do
+      (scope, rest') <- checkDecs rest
+      return (scope, ModDec modd' : rest' )
+\end{lstlisting}
+%$
+When checkDecs encounters a \texttt{ModDec}, \texttt{checkMod} is called to resolve the \texttt{ModDec}.
+The ModDec defines an environment of functions and type declarations called
+modscope, which we add to the local environment by calling \texttt{local
+  (addModule modscope)}\\
+This part of the code is the implementation of rule\ref{Rule3}.
+
+\begin{lstlisting}[language=Haskell]
+checkMod :: ModDefBase NoInfo VName -> TypeM (Scope , ModDefBase Info VName)
+checkMod (ModDef name decs loc) =
+  local (`addBreadcrumb` name) $ do
+    _ <- checkForDuplicateDecs decs
+    (scope, decs') <- checkDecs decs
+    return (scope, ModDef name decs' loc)
+\end{lstlisting}
+%$
+checkMod first adds a ``breadcrumb'' of the structure's name (\textit{strid}) to
+the local environment. This is where the transformation in rule \ref{Rule3} of
+$\Gamma_{local} \Rightarrow \Gamma_{strid}$ is implemented.
+
+After the environment has been given its name, the internal declaration of the
+structure is read using \texttt{checkDecs}.
+
+\subsection{Resolving the application of a longname}
+Resolving the application for a longname is done through two short recursive
+functions.
+
+Figure \ref{resolvelongname} shows the implementation of the longname rule
+\ref{Rule5}:
+\begin{figure}\label{resolvelongname}
+  \begin{lstlisting}[language=Haskell]
+    type LongName = ([Name], name)
+
+    typeFromScope :: LongName -> Scope -> Maybe TypeBinding
+    typeFromScope (prefixes, name) scope = do
+      scope' <- envFromScope prefixes scope
+      let taTable = envTAtable scope'
+      HM.lookup name taTable
+    
+    funFromScope :: LongName -> Scope -> Maybe FunBinding
+    funFromScope (prefixes, name) scope = do
+      scope' <- envFromScope prefixes scope
+      let taTable = envFtable scope'
+      HM.lookup name taTable
+    
+    
+    envFromScope :: [Name] -> Scope -> Maybe Scope
+      envFromScope (x:xs) scope =
+        case HM.lookup x (envModTable scope) of
+          Just scope' -> envFromScope xs scope'
+          Nothing -> Nothing
+    envFromScope [] scope = Just scope
+\end{lstlisting}
 \end{figure}
-The code above will return an \texttt{UndefinedStructure} error, as M0 has not
-been added to the environment when bar is attempted to be resolved}
+%$
 
-If the compiler encounters a reference to a value that has not yet been defined
-in the local environment, it will attempt to resolve the reference in the
-toplevel environment.
+\subsection{Tests}
+\label{subsec:structuretests}
+To verify that the implementation of structures was correct, a series of test
+programs were written to verify, whether the interference rules defined for the
+structures, actually held in an executed Futhark program.
 
-Look at the following example:
-
-
-\subsection{Module access and variable shadowing}
-
-Comments:
-\begin{itemize}
-  \item 2-4: It is allowed to use the same idenfitier several times in a
-    program, as long as they are not used for the same construction; i.e.
-    \begin{verbatim}
-      type foo = ...
-      fun f32 foo = ...
-    \end{verbatim} is allowed, as functions and types are not read to the same
-    table internally during compilation.
-  \end{itemize}
+In the following tests, programs which break the rules are expected to return
+with an error.
 
