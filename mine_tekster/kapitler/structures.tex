@@ -511,8 +511,17 @@ that results in a duplicate definition error. Refer to
 \ref{structuresfuturework} for a possible future solution.
 
 \subsubsection{Keeping track of function names}
+Futharks variable shadowing made it necessary to extend the type of the function
+declaration type. \\
+Initially, a function had only the declared name of the function as an identifier.
+However, it was necessary to extend this name into a pair:
 
+\texttt{type FunName = (declaredName :: Name, expandedName :: LongName)}.
 
+When a function is added to the function table during \texttt{buildFtable}, it
+is added to the function table together with it's longname. The function's
+longname contains the function's name, and the name of the (potentially) nested
+structures it was defined in.
 
 \subsection{Tests}
 \label{subsec:structuretests}
@@ -554,13 +563,15 @@ defined in rule \ref{Rule5}.
 \lstinputlisting[language=Haskell]{../tests/calling_nested_module.fut}
 This test passes.
 \\
+Currying functions such as map and reduce works as expected:\\
 \texttt{map_with_structure0.fut}:
 \lstinputlisting[language=Haskell]{../tests/map_with_structure0.fut}
 This test passes.
 \\
--- fungeren med map (longname)
-
--- included
+Using structures from an include works as expected:\\
+\texttt{Vec3.fut}:
+\lstinputlisting[language=Haskell]{../tests/Vec3.fut}
+\
 \subsubsection{Testing rule for variable shadowing}
 
 \subsection{Results}
