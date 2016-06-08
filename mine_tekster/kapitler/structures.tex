@@ -196,6 +196,11 @@ it is different types of declarations:\\
     \end{prooftree}
       where $decl (name, type) \oplus \Gamma_{local}$ adds the declaration to
       $\Gamma_{local}$ , iff $(name, type) \not\in decls$.
+      \\
+      \\
+      This works, because Functions, TypeAliases, Structures and Signatures are
+      stored in their respective tables, instead of storing all of them in the
+      same table.
   \end{tcolorbox}
 \end{figure}
 
@@ -496,3 +501,24 @@ structures, actually held in an executed Futhark program.
 In the following tests, programs which break the rules are expected to return
 with an error.
 
+\subsubsection{Testing rule for multiple declarations [...]}
+\texttt{duplicate_def0.fut}:
+\lstinputlisting[language=Haskell]{../tests/duplicate_def0.fut}
+This test passes.
+\\
+In the following test, the structure foo contains declarations of name foo also.
+\texttt{duplicate_def1.fut}:
+\lstinputlisting[language=Haskell]{../tests/duplicate_def1.fut}
+This test passes.
+\\
+In the following tests, the programmer has attempted to declare functions and
+types in the same environment, twice.
+
+\texttt{duplicate_error0.fut}:
+\lstinputlisting[language=Haskell]{../tests/duplicate_error0.fut}
+This test passes.
+\\
+In the following test, the structure foo contains declarations of name foo also.
+\texttt{duplicate_error1.fut}:
+\lstinputlisting[language=Haskell]{../tests/duplicate_error1.fut}
+This test passes.
