@@ -18,6 +18,8 @@
     "chunks"
     "subsec:checkfunortype"
     "resolvelongname"
-    "subsec:structuretests"))
+    "subsec:structuretests"
+    "subsec:label"
+    "subsec:structuresfuturework"))
  :latex)
 

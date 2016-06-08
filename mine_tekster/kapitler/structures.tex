@@ -278,6 +278,7 @@ longname:\\
 We can define the interference rule for using a longname in the three different
 cases. As all three cases handles resolving a longname the same way, the rule
 will only be called for the first case:
+
 \begin{figure}\label{Rule5}
   \begin{prooftree}
     \AxiomC{$\Gamma_{local} \vdash \mathtt{apply} \mathit{longname} \Rightarrow \mathtt{apply} \mathit{function} $}
@@ -287,7 +288,7 @@ will only be called for the first case:
   
   where
   \begin{align*}
-    \downarrow longname & = & return getFromEnv(longname, }\Gamma_{local}) \\
+    \downarrow longname & = & return getFromEnv(longname , \Gamma_{local}) \\
   \end{align*}.
 \end{figure}
 
@@ -301,7 +302,6 @@ I will not describe the process in details, but will instead
 explain specific parts of the code.
 I will specifically focus on parts of the code, that corresponds to the
 interference rules described earlier.
-
 
 \subsubsection{The Scope datatype}
 To describe the environment in the Futhark compiler, we use the Scope datatype:
@@ -492,6 +492,28 @@ Figure \ref{resolvelongname} shows the implementation of the longname rule
 \end{figure}
 %$
 
+\subsubsection{Including structures, functions and types from other files}
+The Futhark \texttt{include}-statement lets the user include
+other files into the current program.
+
+This is implemented by letting the Futhark compiler combine the source code from
+all the included files, with the declarations in the main program. The combined
+program is then sent passed on through the rest of the compiler.
+
+As the Futhark program with an arbitrary number of includes is merged into a
+single program within the compiler, we can compartmentalize a program into
+discrete files.
+
+However, this creates a hazard: there might be declarations in the included
+code, which has names that overlap with names in the remaining code, so that a
+\texttt{DuplicateDefinitionError} is triggered. the included code has any declarations
+that results in a duplicate definition error. Refer to
+\ref{structuresfuturework} for a possible future solution.
+
+\subsubsection{Keeping track of function names}
+
+
+
 \subsection{Tests}
 \label{subsec:structuretests}
 To verify that the implementation of structures was correct, a series of test
@@ -502,6 +524,7 @@ In the following tests, programs which break the rules are expected to return
 with an error.
 
 \subsubsection{Testing rule for multiple declarations [...]}
+The following tests are implemented to test whether rule \ref{Rule4} holds.
 \texttt{duplicate_def0.fut}:
 \lstinputlisting[language=Haskell]{../tests/duplicate_def0.fut}
 This test passes.
@@ -522,3 +545,28 @@ In the following test, the structure foo contains declarations of name foo also.
 \texttt{duplicate_error1.fut}:
 \lstinputlisting[language=Haskell]{../tests/duplicate_error1.fut}
 This test passes.
+
+\subsubsection{Testing structures can be called as expected}
+The following tests are implemented to test that calling structures works as
+defined in rule \ref{Rule5}.
+
+\texttt{calling_nested_module.fut}:
+\lstinputlisting[language=Haskell]{../tests/calling_nested_module.fut}
+This test passes.
+\\
+\texttt{map_with_structure0.fut}:
+\lstinputlisting[language=Haskell]{../tests/map_with_structure0.fut}
+This test passes.
+\\
+-- fungeren med map (longname)
+
+-- included
+\subsubsection{Testing rule for variable shadowing}
+
+\subsection{Results}
+\label{subsec:label}
+
+\subsection{Future work}
+\label{subsec:structuresfuturework}
+Create include-as-statement.
+
