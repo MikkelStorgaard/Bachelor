@@ -61,14 +61,14 @@ we can define the following interference rules for using type aliases:
 \begin{prooftree}
   \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
     \UnaryInfC{$\Gamma \vdash$ \texttt{type} \textit{strid }\texttt{=}
-      \textit{Type} $\RightArrow$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
+      \textit{Type} $\Rightarrow$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
       \Gamma'
       \}$}
 \end{prooftree}
 where
 $ \{ strid \to Type \} \oplus \Gamma = \Gamma := Types_{\Gamma} \cup \{strid \to Type\} $ iff the type alias declaration does not
 clash with the current environment. There is no clash, if the declaration obeys
-the three rules in the implementation subsection\ref{typealiasimplementation}
+the three rules in the implementation subsection\ref{typealiasimplementation}.
 
 \begin{prooftree}
   \AxiomC{$\Gamma \vdash typedecls \Rightarrow \Gamma ' $}
@@ -80,14 +80,13 @@ the three rules in the implementation subsection\ref{typealiasimplementation}
 \subsection{Implementation}\label{typealiasimplementation}
 A type alias $strid_i \to Type$ declaration is succesful, if three rules are followed:
 \begin{enumerate}
-  \item The alias $strid_i$ is not already declared\footnote[]{This is by convention of
+  \item The alias $strid_i$ is not already declared\footnote{This is by convention of
       only being able to define a value \textit{once}} in the current local
     environment. I.e. the example below:
     \begin{verbatim}
       type foo = i32
       type foo = f32
     \end{verbatim}
-    
   \item The alias $strid_i$ refers to a type (or a type alias), that is either already
     defined in the current environment (including structure environments), or is
     in the same declaration chunk as $strid_i$. In the example below, \texttt{foo} refers
@@ -120,12 +119,12 @@ A type alias $strid_i \to Type$ declaration is succesful, if three rules are fol
   
     
   \item The alias being resolved cannot be cyclically defined.\label{cyclicaldefinitionerror}
-    Imagine that some type \texttt{type my_type = foo} is in the chain in the
+    Imagine that some type \texttt{type my\_type = foo} is in the chain in the
     type aliasing example\ref{longchain} above.\\
 
     In this case, the compiler is first trying to resolve \texttt{foo} by
     resolving \texttt{bar,} and trying to resolving \texttt{bar} by resolving \texttt{baz}, et cetera. \\
-    At some point, the compiler encounters \texttt{my_type}, and must resolve \texttt{foo} to
+    At some point, the compiler encounters \texttt{my\_type}, and must resolve \texttt{foo} to
     continue - which creates a cycle, because \texttt{foo} is resolved by \texttt{bar}, and so on.
 
     To keep track of this, the compiler maintains the set of aliases that has
@@ -358,7 +357,7 @@ This program fails as expected.
 \subsubsection{Example of planet simulations being simplified by type aliases}
 A nice example of the benefits of type aliasing, is the N-body simulation
 (\texttt{nbody}), which is a simulation over the n-body
-problem\footnote{\href{https://en.wikipedia.org/wiki/N-body_problem}}.
+problem\footnote{\url{https://en.wikipedia.org/wiki/N-body\_problem}}.
 
 The original Futhark implementation of the simulation contained function
 arguments of tuples with arity up to 10. Whilst it is still necessary to bring
@@ -613,7 +612,7 @@ fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
 To make functors work, it must be possible to declare an abstract type alias in
 a structure.
 
-That will allow for a structure definition, where a type variable\footnote[]{in
+That will allow for a structure definition, where a type variable\footnote{in
   the form of a \textit{strid}} has been declared, but not defined, until the
 containing structure is instantiated using a functor.
 
