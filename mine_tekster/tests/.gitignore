@@ -1,2 +1,4 @@
 *.c
 *.bin
+*expected*
+*actual*
