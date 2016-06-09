@@ -4,10 +4,10 @@
 
 type foo = int
 
-structure foo =
-  struct
+struct foo 
+  {
     fun foo foo() = 1
-  end
+  }
 type foo = float
 
 fun int main() = 0

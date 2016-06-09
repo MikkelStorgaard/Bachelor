@@ -6,9 +6,9 @@
 
 type foo = int
 fun foo foo(int a) = a + a
-structure foo =
-  struct
+struct foo 
+  {
     fun int one() = 1
-  end
+  }
 
 fun int main(int x) = x
