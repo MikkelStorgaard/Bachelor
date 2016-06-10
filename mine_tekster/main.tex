@@ -19,8 +19,16 @@
 \usepackage{relsize}
 \usepackage{float}
 \usepackage{pgffor}
-\usepackage[margin=1in]{geometry}
+\usepackage{courier}
 
+\usepackage[margin=1in]{geometry}
+\lstset{ %
+  basicstyle=\footnotesize\ttfamily ,
+  breaklines=true ,
+  framextopmargin=50pt,
+  frame=bottomline
+  }
+\tcbset{colback=blue!5!white}
 \title{
   Modules in Futhark
 }

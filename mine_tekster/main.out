@@ -1,0 +1,49 @@
+\BOOKMARK [2][-]{subsection.0.1}{Abstract}{}% 1
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 2
+\BOOKMARK [2][-]{subsection.1.1}{Problem definition}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{Motivation}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{Abstraction increases readability.}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{Approximating higher order functionality whilst keeping performance}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.3}{Scope of project}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.4}{Success definitions}{section.2}% 8
+\BOOKMARK [1][-]{section.3}{Type aliases}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{The language}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Interference rules}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{Implementation}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.4}{Parsing a type alias}{section.3}% 13
+\BOOKMARK [3][-]{subsubsection.3.4.1}{Data types for describing a type}{subsection.3.4}% 14
+\BOOKMARK [3][-]{subsubsection.3.4.2}{Adding resolved types to scope}{subsection.3.4}% 15
+\BOOKMARK [3][-]{subsubsection.3.4.3}{Converting UserType to TypeBase}{subsection.3.4}% 16
+\BOOKMARK [3][-]{subsubsection.3.4.4}{Why we added UserType instead of extending TypeBase}{subsection.3.4}% 17
+\BOOKMARK [3][-]{subsubsection.3.4.5}{The slip from type aliases to realized types}{subsection.3.4}% 18
+\BOOKMARK [2][-]{subsection.3.5}{Results}{section.3}% 19
+\BOOKMARK [3][-]{subsubsection.3.5.1}{A type cannot be defined twice in the same environment}{subsection.3.5}% 20
+\BOOKMARK [3][-]{subsubsection.3.5.2}{A type alias cannot be defined, if it refers to a type alias that has not been defined}{subsection.3.5}% 21
+\BOOKMARK [3][-]{subsubsection.3.5.3}{A type alias cannot be cyclically defined}{subsection.3.5}% 22
+\BOOKMARK [3][-]{subsubsection.3.5.4}{Example of planet simulations being simplified by type aliases}{subsection.3.5}% 23
+\BOOKMARK [2][-]{subsection.3.6}{Future work}{section.3}% 24
+\BOOKMARK [1][-]{section.4}{Structures}{}% 25
+\BOOKMARK [2][-]{subsection.4.1}{Accessing types and functions within structures}{section.4}% 26
+\BOOKMARK [2][-]{subsection.4.2}{Interference rules}{section.4}% 27
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Adding declarations to the environment}{subsection.4.2}% 28
+\BOOKMARK [2][-]{subsection.4.3}{Interference rules for structure definitions}{section.4}% 29
+\BOOKMARK [3][-]{subsubsection.4.3.1}{Rule for multiple declarations of same name in same local environment:}{subsection.4.3}% 30
+\BOOKMARK [3][-]{subsubsection.4.3.2}{Rule for adding a structure to the local environment}{subsection.4.3}% 31
+\BOOKMARK [3][-]{subsubsection.4.3.3}{Rule for variable shadowing}{subsection.4.3}% 32
+\BOOKMARK [2][-]{subsection.4.4}{Interference rules for interpreting functions and types in an environment with structures}{section.4}% 33
+\BOOKMARK [2][-]{subsection.4.5}{Implementation}{section.4}% 34
+\BOOKMARK [3][-]{subsubsection.4.5.1}{The Scope datatype}{subsection.4.5}% 35
+\BOOKMARK [3][-]{subsubsection.4.5.2}{checkProg}{subsection.4.5}% 36
+\BOOKMARK [3][-]{subsubsection.4.5.3}{Checking for duplicates}{subsection.4.5}% 37
+\BOOKMARK [2][-]{subsection.4.6}{Dividing a Futhark program into chunks}{section.4}% 38
+\BOOKMARK [2][-]{subsection.4.7}{Checking function- and type declarations}{section.4}% 39
+\BOOKMARK [2][-]{subsection.4.8}{Checking structure declarations}{section.4}% 40
+\BOOKMARK [2][-]{subsection.4.9}{Resolving the application of a longname}{section.4}% 41
+\BOOKMARK [3][-]{subsubsection.4.9.1}{Including structures, functions and types from other files}{subsection.4.9}% 42
+\BOOKMARK [3][-]{subsubsection.4.9.2}{Keeping track of function names}{subsection.4.9}% 43
+\BOOKMARK [2][-]{subsection.4.10}{Tests}{section.4}% 44
+\BOOKMARK [3][-]{subsubsection.4.10.1}{Testing rule for multiple declarations [...]}{subsection.4.10}% 45
+\BOOKMARK [3][-]{subsubsection.4.10.2}{Testing structures can be called as expected}{subsection.4.10}% 46
+\BOOKMARK [3][-]{subsubsection.4.10.3}{Testing rule for variable shadowing}{subsection.4.10}% 47
+\BOOKMARK [2][-]{subsection.4.11}{Results}{section.4}% 48
+\BOOKMARK [2][-]{subsection.4.12}{Future work}{section.4}% 49

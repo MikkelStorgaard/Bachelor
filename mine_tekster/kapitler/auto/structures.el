@@ -4,6 +4,7 @@
    (LaTeX-add-labels
     "sec:structures"
     "subsec:structuresaregood"
+    "structuresinterferencerules"
     "Rule1"
     "normaldecls"
     "Rule2type"
@@ -18,8 +19,9 @@
     "chunks"
     "subsec:checkfunortype"
     "resolvelongname"
+    "structuresincludes"
     "subsec:structuretests"
-    "subsec:label"
+    "subsec:structuresresults"
     "subsec:structuresfuturework"))
  :latex)
 

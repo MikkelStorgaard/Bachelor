@@ -12,6 +12,7 @@ Is it possible to implement a module system in Futhark, which displays features
 comparable to the module system implemented in Standard ML? \cite{sml modules}
 %% sml-henvisninger fra bogen måske?
 
+\pagebreak
 \section{Motivation}
 \label{subsec:label}
 The implementation of a module system, will greatly expand the usability of
@@ -21,35 +22,43 @@ examples of why these features are desirable.\\
 
 To be able to claim, that modules increases usability, we must first
 setup some metrics of usability.
-
+\\
+\\
 \textbf{Readability increases usability:}\\
-%% skriv mere her
+skriv mere her\\
 \textbf{Compartmentalization of functionality increases usability:}\\
-%% skriv mere her
-\textbf{A module system increases the ability to share code between developers.}
-%% skriv mere her
+skriv mere her\\
+\textbf{A module system increases the ability to share code between developers.}\\
+skriv mere her
 
-\subsection{Abstraction increases readability.} In example, type aliasing lets us abstract
+\subsection{Abstraction increases readability.} 
+In example, type aliasing lets us abstract
 from the actual definition of data types.
 When writing our source code, we can define our type aliases before writing the
 rest of our program.
 %% skriv bedre
 If we want to define a sphere in a three dimensional space, we want to define it
-with 1) a radius, 2) a position , and 3) a direction that it is
+with \\
+\textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
 moving. 
-
 Let us define a function that multiplies the speed of the sphere by a factor k.
-\begin{verbatim}
-fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity({f32 r, {f32 x_pos , f32 y_pos , f32 z_pos} , {f32 x_dir,
-f32 y_dir, f32 z_dir}} , f32 k) =
-  {r, {x_pos, y_pos, z_pos}, {k * x_dir , k * y_dir, k * z_dir }}
-\end{verbatim}
-
+\begin{figure}[h]
+\begin{lstlisting}
+fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
+	{f32 r, 
+	{f32 x_pos , f32 y_pos , f32 z_pos} , 
+	{f32 x_dir,f32 y_dir, f32 z_dir}} , f32 k) 
+	  =
+    {r, {x_pos, y_pos, z_pos}, {k * x_dir , k * y_dir, k * z_dir }}
+\end{lstlisting}
+\end{figure}
+\clearpage
+\noindent
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
 Coupled with helper functions, we can now multiply the speed of the sphere like
 this:
-
+\begin{figure}[h]
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
 type position, direction = vec3 
@@ -59,30 +68,30 @@ type sphere = {radius, position, direction}
 fun vec3 multiply_vector(vec3 {pos_x, pos_y, pos_z}, f32 k) =
   {k * pos_x , k * pos_y , k * pos_z}
 
-fun sphere multiply_velocity(sphere {radius, position, direction}, f32 factor) =
-  let new_direction = multiply_vector(direction, factor)
-  in {radius, position, new_direction}
+fun sphere multiply_velocity(
+  sphere {radius, position, direction}, f32 factor)  =
+    let new_direction = multiply_vector(direction, factor)
+    in {radius, position, new_direction}
 \end{verbatim}
+\end{figure}
 
-As we are now using the sphere type as the function argument, we can pattern
+\noindent As we are now using the sphere type as the function argument, we can pattern
 match on the type aliased values contained in the sphere type.
 Most importantly, the vectors of the sphere are abstracized into a single variables
 instead of tuples.
-
-The end result is a shorter, more readable program. %% se bilag sphere test
-
-
+\\
+The end result is a shorter, more readable program~\ref{nbody}
 
 \subsection{Approximating higher order functionality whilst keeping performance}
 \label{subsec:higherorderfunctionality}
 It is possible to express higher-order functionality in Futhark, without taking
 a performance hit in the compiled Futhark code.
 %% reference to slow higher order functionality
-We will reiterate on the concept of modules\ref{modulesaregood}, by introducing
+We will reiterate on the concept of modules\ref{sec:structures}, by introducing
 the concept of functors.
 First we repeat the three-dimensional vector module
 from earlier, but without declaring any particular
-primitive\ref{typedefinitions} type as the contained type of the vector:
+primitive \ref{futharks_types} type as the contained type of the vector:
 \begin{verbatim}
   structure Vec3 = 
     struct
@@ -93,34 +102,37 @@ primitive\ref{typedefinitions} type as the contained type of the vector:
       fun vector divide ( ... ) = ...
     end
 \end{verbatim}
-
+\noindent
 The structure above cannot be used on its own. Type \texttt{t} is not
 instantiated, and the module cannot be type checked, which causes an error.
 
+\noindent
 We can solve that problem, by instantiating the abstract structure, using a
 simple functor; the \texttt{where}-clause.
 \begin{verbatim}
   structure IntVec3 = Vec3 where type t = int
 \end{verbatim}
+\noindent
 We can now access the structure \texttt{IntVec3} throughout the rest of the
-program. The structure \texttt{IntVec3} is \texttt{Vec3}, except all instances
+program.
+\\
+The structure \texttt{IntVec3} is \texttt{Vec3}, except all instances
 of type \texttt{t} in \texttt{Vec3} is exchanged with type \texttt{int}.
-
-To recap: functors allows us to define an abstract implementation of some
+\\
+\\
+\textbf{To recap:} functors allows us to define an abstract implementation of some
 structure \textbf{ONCE}, and lets us instantiate this structure any number of
 times, each time with our own type.
-
-This functionality will be elaborated on in a later section\ref{functors}. 
-
+\\
+This functionality will be elaborated on in a later section Functors\ref{functors}. 
+\\
+\\
 From a performance-concerned point of view, the module system is desirable.
 Every function in the written program, whether it is inside a structure
 or defined in the top level program, is ultimately accumulated into the same
-scope.
-
-No matter how complex the written Futhark program is, module use and all, the
-internalised\footnote{The internal representation of the Futhark program
-  within the compiler} Futhark program keeps every function in the same table.
-
+scope. \ref{structuresincludes}
+\\
+\\
 The entire program is then compiled, and the optimizations that makes FUTHARK \texttt{GO
 FAST } are applied to the included modules as well as the top level declarations.
 
@@ -142,4 +154,5 @@ The scope of the project is
 
 \subsection{Success definitions}
 \label{subsec:label}
-
+fyld-ud
+\clearpage

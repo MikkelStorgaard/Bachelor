@@ -11,15 +11,19 @@ Take this example of a program with two different vector types:
 type vec3 = {f32, f32, f32}
 type vec4 = {f32, f32, f32, f32}
 
-fun vec3 vec3_plus(vec3 {a_1, ... , a_3}, vec3 {b_1, ..., b_3}) =
-  {a_1 + b_1, ... , a_3 + b_3}
+fun vec3 vec3_plus(
+  vec3 {a_1, ... , a_3}, 
+  vec3 {b_1, ..., b_3}
+  ) = {a_1 + b_1, ... , a_3 + b_3}
 
-fun vec4 vec4_plus(vec4 {a_1, ... , a_4}, vec4 {b_1, ..., b_4}) =
-  {a_1 + b_1, ... , a_4 + b_4}
+fun vec4 vec4_plus(
+  vec4 {a_1, ... , a_4}, 
+  vec4 {b_1, ..., b_4}
+  ) = {a_1 + b_1, ... , a_4 + b_4}
 \end{verbatim}
-
-Let us try compartmentalizing a vector type and its functions into a structure.
-In the following example, we have defined two different modules, each
+\noindent
+Let us try compartmentalizing a vector type and its functions into a structure.\\
+  In the following example, we have defined two different modules, each
 containing a structure,
 and a futhark program which includes and utilizes these modules:
 \begin{verbatim}
@@ -40,7 +44,9 @@ Vec4Float.fut:
       fun vector minus( ... ) = ...
       fun vector multiply ( ... ) = ...
     end
-  
+\end{verbatim}
+\clearpage
+\begin{verbatim}
 myprogram.fut:
 
   include Vec3Float
@@ -53,18 +59,14 @@ myprogram.fut:
     let {a, b, c} = Vec3.plus(vector, vector)
     in Vec4.multiply({a, b, c, 1.0f} , 4.0f)
 \end{verbatim}
-
+\noindent
 Whilst it \textit{is} possible to create libraries without a module
 implementation \footnote{By including libraries that adds functions to the top
   level environment}, the user runs a risk of running into errors like
 \texttt{MulipleDefinitionError}\footnote{Multiple functions of same name
   defined}, if any of the library functions uses any of the names, that the
 local user is using as well.
-
-An obvious use case is including a library of standard modules with the Futhark
-language, as the ones displayed in other languages like Standard
-ML\cite{sml_standard_lib} or Python\cite{python3_docs}.
-
+\\\\
 The module system removes this hazard, as application of functions and types are
 done using \textbf{longnames}, which adds prefixes to names. This way, functions
 can have the same name, as long as they do not share the same prefix.
@@ -72,53 +74,41 @@ can have the same name, as long as they do not share the same prefix.
 \begin{tcolorbox}
 \textbf{Longnames:}\\
 A longname consists of any amount of prefixes followed by a dot, followed by the
-string id of the desired function or type.
+string id of the desired function or type:
+\begin{align*}
+LongName & :  & \texttt{prefix.}LongName \\
+         &\ | & \texttt{identifier}
+\end{align*}
 
 In Futhark we will be using string ids for declarations, and longnames for
 the accessing types and functions in structures.
+
+
 \end{tcolorbox}
-
-%% mere her
-%% this is elaborated on during the scope
-
 \subsection{Accessing types and functions within structures}
-
 To work with type aliases and modules, we need to define the internal
-environment of Futhark during compile time.
-
-Before starting this project, the environment of Futhark could be described like
-this:
-$\Gamma = Functions$, where $Functions : \{ Function : (strid,
-  ArgTypes, RetType) \}$ where both ArgTypes and RetTypes they
-have types $Type$, which is any type as defined in
-\ref{initialtypegrammar}.\\
-
-It is the goal of this project to expand the environment of Futhark, so that
-$\Gamma = (Functions, TypeAliases, Signatures, Structures)$.
-
-TypeAliases, Signatures and Structures are described in their respective
-sections. A structure can be regarded as a structure name, a reference to the
-current total environment and an environment contained in the structure, so that
-$Structure_{strid} = (strid, \Gamma,  \Gamma_{strid})$. Any $\Gamma_{strid}$
-contains its own functions, typealiases, signatures and structures.\\
+environment of Futhark during compile time.\\
 \\
-$Gamma_{env}$ refers to the global environment at the given point in program
-parsing.
-$Gamma_{local}$ refers to the environment, that we are currently working in.
+Before starting this project, the environment of Futhark could be described like
+this:\\
+$\Gamma = (FE)$ , where \textit{FE} is a function environment, mapping function ids to functions:
 
-
+ $\{funid \to funexpr\}$.
+\\\\
+It is the goal of this project to expand the environment of Futhark, so that\\[0.2em]
+$\Gamma = (FE, TE, SIGE, STRUCTE, FUNCTE)$, where the additions are a type alias environment, a signature environment, a structure environment and a functor environment.\\[0.2em]
+Type aliases, signatures, structures and functors are described in their respective
+sections.\\
+A structure can be regarded as a structure name and an environment contained in the structure, so that
+$\{strid \to \Gamma_{strid}\}$ is a mapping in \textit{STRUCTE}.
+\clearpage
+Any $\Gamma_{strid}$ contains its own function-, typealias-, signature-, structure- and functor declarations.\\
+\\
 
 \subsection{Interference rules}\label{structuresinterferencerules}
 Now that we can discern between the glocal environment, and any number of
 environments in structures, we must redefine the environment behaviour of Futhark at compile time.
 \\
-\\
-If a function definition is defined as this:
-\\
-$fundef : fun RetType strid ArgTypes = Expressions$
-\\ then adding a function to the Futhark environment follows the following rule:
-
-
 \begin{figure}\label{Rule1}
   \begin{tcolorbox}
     \begin{prooftree}
@@ -127,11 +117,14 @@ $fundef : fun RetType strid ArgTypes = Expressions$
         fundef_{strid} \Rightarrow \Gamma_{local}' $ }
     \end{prooftree}
 
-    where $fundef_{name} \oplus \Gamma_{local} = \Gamma_{local} := (Functions_{\Gamma_{local}} \cup \{strid \to
-      fundef \})$
+    where
+	\begin{align*}
+                & fundef_{strid} \oplus \Gamma_{local} \\
+    \Rightarrow &\ \Gamma_{local} \leftarrow Functions (\Gamma_{local}) \cup \{strid \to
+      fundef \})
+	\end{align*}
     iff the function the function body is otherwise well-formed\footnote{I will not go further into
       the functionality of functions, as it is not within scope of this project.}.
-
   \end{tcolorbox}
   \caption{Rule for adding a function to the environment}
 \end{figure}
@@ -141,14 +134,19 @@ addition of any of these three elements follow the following rule:
 \subsubsection{Adding declarations to the environment}\label{normaldecls}
 \begin{figure}\label{Rule2type}
   \begin{tcolorbox}
-
     \begin{prooftree}
       \AxiomC{ $\Gamma_{local} \vdash typedecl \Rightarrow \Gamma_{local} ' $ }
-      \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{type} \textit{strid }\texttt{=} \textit{Type} $\Rightarrow \{ strid \to Type \} \oplus \Gamma_{local} \Rightarrow \Gamma_{local}'\} $ }
+      \UnaryInfC{ $\Gamma_{local} \vdash$ \texttt{type} \textit{strid }\texttt{=} \textit{Type} $\Rightarrow \{ strid \to Type \} \oplus \Gamma_{local} \Rightarrow \Gamma_{local}' \} $ }
     \end{prooftree} where
-    $\{ strid \to Type \} \oplus \Gamma_{local} = \Gamma_{local} := Types_{\Gamma} \cup \{strid
-    \to Type'\}$ and $Type' := Type resolved in \Gamma_{local}$ as defined in
-    \ref{typealiasinterference}.
+    \begin{align*}
+            & \{ strid \to Type \} \oplus \Gamma_{local} \\ 
+\Rightarrow &\ \Gamma_{local} \leftarrow Types(\Gamma) \cup \{strid \to Type'\}
+    \end{align*}
+     and 
+     \begin{align*}
+     Type' \leftarrow Type\ resolved\ in \Gamma_{local}
+     \end{align*}
+     as defined in \ref{typealiasinterference}.
   \end{tcolorbox}
 \end{figure}
 

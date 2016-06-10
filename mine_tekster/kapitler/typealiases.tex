@@ -4,58 +4,55 @@ to implement type aliases first.
 
 
 
-\subsection{The language}
+\subsection{The language}\label{futharks_types}
 The initial type system in Futhark supported the following type definitions:
 \begin{align*}
-  Type           & = & Primitive type
-                 & | & { Types }
-                 & | & [ Type ]
+  Type           & = & \texttt{Primitive type} \\
+                 &\ | & ( Types ) \\
+                 &\ | & [ Type ] \\
   \\
   \\
-  Types          & = & Type , Types
-                 & | & Type
+  Types          & = & Type\ ,\ Types \\
+                 &\ | & Type \\
   \\
   \\
   Primitive type & = & UnsignedInteger \\
-                 & | & SignedInteger \\
-                 & | & FloatType \\
-                 & | & Boolean \\
+                 &\ | & SignedInteger \\
+                 &\ | & FloatType \\
+                 &\ | & Boolean \\
 \end{align*}
 
 Implementing type aliases expands our type constructions as following:
 \begin{align*}
-  Type           & : & Primitive type
-                 & | & { Types }
-                 & | & [ Type ]
-                 & | & TypeAlias
+  Type           & : & \texttt{Primitive type} \\
+                 &\ | & ( Types ) \\
+                 &\ | & [ Type ] \\
+                 &\ | & TypeAlias \\
   \\
   \\
-  Types          & : & Type , Types
-                 & | & Type
+  Types          & : & Type\ ,\ Types \\
+                 &\ | & Type \\
   \\
   \\
-  Primitive type & : & UnsignedInteger \\
-                 & | & SignedInteger \\
-                 & | & FloatType \\
-                 & | & Boolean \\
+  Primitive type & : & \texttt{UnsignedInteger} \\
+                 &\ | & \texttt{SignedInteger} \\
+                 &\ | & \texttt{FloatType} \\
+                 &\ | & \texttt{Boolean} \\
   \\
   \\
-  TypeAlias      & :: & { TypeAliasDeclaration } \\
-                 & :  & type strid = Type \\
-                 & |  & type Strids = Type \\
-  \\
-  \\
-  Strids         & :  & strid , Strids \\
-                 & |  & strid \\
+  TypeAlias      & :  & \texttt{type}\ strid\ \texttt{=}\ Type \\
 \end{align*}
-where $strid$ is short for \textit{string id}, a string identifier.
+where $type\_id$ is short for \textit{string id}, a string identifier.
 
-\subsection{rules (SAT-like mapping }
-A type alias in a Futhark program is done like this:\\
-\indent \texttt{type} \textit{Strids} \texttt{=} \textit{Type} \\
-, where Type is as defined in the grammar above.
+\subsection{Interference rules}
+A type alias in a Futhark program is done like this: \texttt{type} \textit{Strids} \texttt{=} \textit{Type} ,\\
+where \textit{Type} is as defined in the grammar above.
+\\
+\label{typealiasinterference}
+\begin{tcolorbox}
+Given an environment
+$\Gamma : (Functions, Types),\ Types = \{ strid \to Type \}$
 
-\label{typealiasinterference}Given an environment $\Gamma : (Functions, Types), Types = { strid \to type }$,
 we can define the following interference rules for using type aliases:
 
 \begin{prooftree}
@@ -66,17 +63,31 @@ we can define the following interference rules for using type aliases:
       \}$}
 \end{prooftree}
 where
-$ \{ strid \to Type \} \oplus \Gamma = \Gamma := Types_{\Gamma} \cup \{strid \to Type\} $ iff the type alias declaration does not
+\begin{align*}
+             & \{ strid \to Type \} \oplus \Gamma  \\
+ \Rightarrow & Types(\Gamma) \leftarrow \ Types(\Gamma) \cup \{strid \to Type\}
+\end{align*}
+\\
+iff the type alias declaration does not
 clash with the current environment. There is no clash, if the declaration obeys
 the three rules in the implementation subsection\ref{typealiasimplementation}.
-
+\\
+\\
+We can assign the same type to several string ids simultaneously, as long as we don't declare the same type alias twice.
 \begin{prooftree}
-  \AxiomC{$\Gamma \vdash typedecls \Rightarrow \Gamma ' $}
+  \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
   \AxiomC{Strids = $strid_1 , ... , strid_n$ }
-    \BinaryInfC{ $\Gamma \vdash$ \texttt{type} \textit{Strids}\texttt{=}
+    \BinaryInfC{ $\Gamma \vdash$\texttt{type }\textit{Strids }\texttt{= }
       \textit{Type} $\Rightarrow$ $\{ strid_1 \to Type, .. , strid_n \to Type \} \oplus \Gamma \Rightarrow \Gamma' \}$}
 \end{prooftree}
+      where
+\begin{align*}
+             & \{ strid_1 \to Type, \cdots,  strid_n \to Type, \} \oplus \Gamma  \\
+ \Rightarrow & Types(\Gamma) \rightarrow \ Types(\Gamma) \cup \{ strid_1 \to Type, \cdots,  strid_n \to Type \}
+\end{align*}
+      
 
+\end{tcolorbox}
 \subsection{Implementation}\label{typealiasimplementation}
 A type alias $strid_i \to Type$ declaration is succesful, if three rules are followed:
 \begin{enumerate}
@@ -87,20 +98,22 @@ A type alias $strid_i \to Type$ declaration is succesful, if three rules are fol
       type foo = i32
       type foo = f32
     \end{verbatim}
+\clearpage
   \item The alias $strid_i$ refers to a type (or a type alias), that is either already
     defined in the current environment (including structure environments), or is
     in the same declaration chunk as $strid_i$. In the example below, \texttt{foo} refers
-    to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.
+    to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.\\
+    \\
     Therefore, \texttt{foo} can be resolved by resolving \texttt{bar}. The implementation of this
-    described in a later subsection\ref{typealiascode}.
+    described in a later subsection\ref{typealiasingcode}.
     \begin{verbatim} 
       type foo = bar
       type bar = {f32, i32}
     \end{verbatim}
     There are no hard limit to the number of type aliases that has to be
     checked, before a type alias is resolved:
-    \begin{figure}\label{longchain}
-      \begin{verbatim} 
+    \label{longchain}
+      \begin{verbatim}
         type foo = bar
         type bar = {f32, baz, i32}
         type baz = [{bee, bang, boo}]
@@ -110,15 +123,11 @@ A type alias $strid_i \to Type$ declaration is succesful, if three rules are fol
   
         type bep = i32
         \end{verbatim}
-      \caption{A long chain of type aliases. These will be resolved by the
-        compiler, even if the compiler has to resolve several undefined aliases,
-      before everything is resolved}
-    \end{figure}
     Such a chain of type aliases is allowed, as long as the last of the three
     rules is obeyed:
-  
-    
-  \item The alias being resolved cannot be cyclically defined.\label{cyclicaldefinitionerror}
+    \\
+    \\
+  \item The alias being resolved cannot be cyclically defined.\label{cyclicaldefinitionerror}\\
     Imagine that some type \texttt{type my\_type = foo} is in the chain in the
     type aliasing example\ref{longchain} above.\\
 
@@ -157,9 +166,9 @@ following datatype \texttt{TypeBase}:
   | ArrayArrayElem (ArrayTypeBase shape as vn)
   | TupleArrayElem [TupleArrayElemTypeBase shape as vn]
 \end{lstlisting}
-
+\noindent
 These are also the data types that are used in the internal Futhark program.
-
+\\
 Before this project, Futhark parsed types from Futhark source code directly to
 TypeBases.
 However, we decided to add an intermediate data type between raw source
@@ -174,10 +183,10 @@ data UserType vn = UserPrim PrimType SrcLoc
 
     deriving (Show)
 \end{lstlisting}
-
+\noindent
 The parser was changed, so type declarations in Futhark source would now be parsed as UserTypes and not
 typebases.
-
+\pagebreak
 \subsubsection{Adding resolved types to scope}\label{typealiasingcode}
 \begin{lstlisting}[language=Haskell, numbers=left]
   type TypeAliasTableM =
@@ -214,36 +223,43 @@ typeAliasTableFromProg defs scope = do
               | otherwise ->
                   throwError $ UndefinedAlias loc name
 \end{lstlisting}
-
+\noindent
 TypeAliasTableM is a monad stack that is used to resolve a list of type alias
 declarations in a declaration chunk. \\
 It is a reader monad transformer that contains a state monad transformer, that
 contains the TypeM monad.
-
+\\
+\\
+\noindent
 The reader monad is used to contain a HashSet as its environment. This
 environment is used to keep check of cyclical definitions as described in
-\ref{cyclicaltypedefinition}.
-
+\ref{cyclicaldefinitionerror}.
+\\
+\\
 For each type alias, we use the function \texttt{process} to resolve the type, and modify
 the scope contained within the state monad of the ReaderT.
-
-Resolving a type from a type aliasing is done using the function typeOfName in
-the code snippet\ref{typealiasingcode}. typeOfName tries to
+\\
+\\
+Resolving a type from a type aliasing is done using the function \texttt{typeOfName} in
+the code snippet\ref{typealiasingcode}. \texttt{typeOfName} tries to
 resolve the type by name by retrieving the scope contained in the transformed
-State monad inside the reader. If this is not immediately possible, we must
-either continue our search for the type, throw an error due to a cyclical type
-definition, or throw an error because the type alias has not been defined yet.
-
+State monad inside the reader.
+\clearpage
+\noindent
+If this is not immediately possible, we must either continue our search for the type, throw an error due to a cyclical type definition, or throw an error because the type alias has not been defined yet.
+\\
 If our attempt to resolve $strid_a$ leads to another alias
 $strid_b$\footnote{line 27-33}, we add
 $strid_a$ to our reader environment using the function \texttt{local}, and
 process $alias_b$ instead.
-
-\textit{Acknowledgement}: The initial design of expandType and the addition of
+\\
+\\
+\begin{tcolorbox}
+\textbf{Acknowledgement}: The initial design of \texttt{expandType} and the addition of
 type aliases to the scope was initially much larger, but was reduced in size by
 Troels Henriksen, who rewrote the process to use monads, and reduced some code
 duplication. 
-
+\end{tcolorbox}
 \subsubsection{Converting UserType to TypeBase}
 \begin{lstlisting}[language=Haskell, numbers=left]
 expandType :: (Applicative m, MonadError TypeError m) =>
@@ -272,8 +288,8 @@ expandType look (UserUnique t loc) = do
 Adding UserType and then resolving these into TypeBases whilst running the
 program through the TypeChecker, removes the need of handling UserAliases after
 the type check, where these aliases are resolved.
-
-\label{typeclarification} Furthermore, not all information about a TypeBase declaration
+\\\\
+\label{typeclarification}Furthermore, not all information about a TypeBase declaration
 can actually be claimed already at program parse time.
 Some information about i.e. IKKE SIKKER HER array dimensionality in regards to aliased arrays, is decided within the type
 checker as well. 
@@ -291,14 +307,14 @@ data TypeDeclBase f vn =
                              -- ^ The type deduced by the type checker.
            }
 \end{lstlisting}
-
-An unresolved type looks like this:\\
-\indent \texttt{TypeDecl userType NoInfo}
-After resolve, NoInfo has been filled out with a variable of type \texttt{Info
-  TypeBase}, giving us the following TypeDecl:\\
-\indent \texttt{TypeDecl usertype Info typebase}.
-
-At any point after the type check, only the expandedType of TypeDecl is used.
+An unresolved type looks like this:\\\\
+\indent \texttt{TypeDecl userType NoInfo}\\
+\\
+After resolve, NoInfo has been filled out with a variable of type\\
+\texttt{Info TypeBase}, giving us the following TypeDecl:\\\\
+\indent \texttt{TypeDecl usertype (Info typebase)}.\\
+\\
+At any point after the type check, only the \texttt{expandedType} of TypeDecl is used.
 
 \subsection{Results}
 The addition of type aliases works without any issues.
@@ -353,8 +369,8 @@ type t2 = t0
 fun t1 main(t1 x) = x
 \end{verbatim}
 This program fails as expected.
-
-\subsubsection{Example of planet simulations being simplified by type aliases}
+\clearpage
+\subsubsection{Example of planet simulations being simplified by type aliases}\label{nbody}
 A nice example of the benefits of type aliasing, is the N-body simulation
 (\texttt{nbody}), which is a simulation over the n-body
 problem\footnote{\url{https://en.wikipedia.org/wiki/N-body\_problem}}.
@@ -503,7 +519,8 @@ fun {[f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
 \end{lstlisting}
 
 to
-
+\clearpage
+\noindent \textbf{nbody using type aliases:}
 \begin{lstlisting}
 type mass = f32
 type vec3 = (f32, f32, f32)
@@ -607,13 +624,11 @@ fun ([f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32, n], [f32,
   let bodies'' = map(unwrap_body, bodies')
    in unzip(bodies'')
 \end{lstlisting}
-
 \subsection{Future work}
 To make functors work, it must be possible to declare an abstract type alias in
-a structure.
-
-That will allow for a structure definition, where a type variable\footnote{in
-  the form of a \textit{strid}} has been declared, but not defined, until the
-containing structure is instantiated using a functor.
-
+a structure.\\
+\\
+That will allow for a structure definition, where a type variable\footnote{in the form of a \textit{strid}} has been declared, but not defined, until the containing structure is instantiated using a functor.
+\\
 This has not been implemented yet.
+\clearpage
