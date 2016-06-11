@@ -1,0 +1,77 @@
+\section{Signatures}
+Just like a type signature of a function is the definitions of the argument- and
+return types of a function, we can define module signatures similarly:\\\\
+A module signature specifies the type signatures for a set of declarations.\\
+Let us define a signature called \texttt{hasPlus}:
+\begin{lstlisting}
+  sig hasPlus {
+    type t
+    val plus : (t,t) -> t
+  }
+\end{lstlisting}
+
+Then, after this declaration, we can define some structure, and append this
+structure declaration with a signature:
+\begin{lstlisting}
+  include hasPlus
+  
+  struct M0 {
+    ...
+  } : hasPlus
+\end{lstlisting}
+With this signature, we promise that the structure \texttt{M0} matches the declarations
+in signature \texttt{hasPlus}.
+In the instance of \texttt{M0}, we now require, that \texttt{M0} has a
+declaration, where alias \texttt{t} is assigned.\texttt{M0} must also have a
+function, that takes two arguments of type \texttt{t}, and returns a value of
+type \texttt{t}.
+
+In the following example, two structures are written. \texttt{M0} adheres to the
+specifications in \texttt{hasPlus} , but \texttt{M1} does not, which ultimately results in an
+error at compile time:
+
+\begin{lstlisting}
+  include hasPlus
+  
+  struct M0 {
+    type t = int
+    fun t plus(t a, t b) = a + b
+  } : hasPlus
+  
+  struct M1 {
+    type t = (int, int)
+    fun int plus(t tuple) =
+      let (a, b) = tuple
+      in a + b
+  } : hasPlus
+\end{lstlisting}
+\subsection{Purpose of module signatures}
+By themselves, the ability to add a signature to a structure does not add any
+significicant usefulness to a language. Signatures are useful together with
+\textit{functors}\ref{functors}, so I will refrain from doing further
+explanation outside of functor context.
+
+
+\subsection{Implementation}
+\textit{This section is not complete, as I have not implemented a complete and working
+signature system at this point.
+}
+
+We need a data type which represents a signature.
+I chose to define it as a table from some declaration name to a signature
+binding:
+\begin{lstlisting}[language=Haskell]
+type Signature = HM.HashMap Name SigBinding
+
+data SigBinding = FunSignature (Maybe (TypeDeclBase Info VName)) (TypeDeclBase Info VName)
+                  -- ^ A function may take arguments, but might also be a
+                  constant.
+                  -- It always has a return type.
+
+                | TypeSignature (TypeDeclBase Info VName)
+                  -- A type signature must resolve to a type.  
+                  
+                | ModSignature LongName
+                -- A structure of signature sig, can itself be demanded to
+                -- contain a structure of some ModSignature
+\end{lstlisting}

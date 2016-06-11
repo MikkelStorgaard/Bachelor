@@ -51,20 +51,20 @@ where \textit{Type} is as defined in the grammar above.
 \label{typealiasinterference}
 \begin{tcolorbox}
 Given an environment
-$\Gamma : (Functions, Types),\ Types = \{ strid \to Type \}$
-
+$\Gamma : \{FE, TE\},\ Types = \{ strid \to Type \},\ Type \to \tau\footnote{We will let $\tau$ designate a primitive type in Futhark}$
 we can define the following interference rules for using type aliases:
 
 \begin{prooftree}
   \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
-    \UnaryInfC{$\Gamma \vdash$ \texttt{type} \textit{strid }\texttt{=}
-      \textit{Type} $\Rightarrow$ $\{ strid \to Type \} \oplus \Gamma \Rightarrow
-      \Gamma'
-      \}$}
+  \AxiomC{$\Gamma \vdash Type \to \tau$}
+  \AxiomC{$\Gamma \not \vdash type\_id \to Type$}
+    \TrinaryInfC{$\Gamma \vdash$ \texttt{type} \textit{type\_id }\texttt{=}
+      \textit{Type} $\Rightarrow$ \{$ \emptyset , \{ type\_id \to Type \}\}
+      \oplus \Gamma$}
 \end{prooftree}
 where
 \begin{align*}
-             & \{ strid \to Type \} \oplus \Gamma  \\
+             & \{ \emptyset , \{ strid \to Type \} \} \oplus \Gamma  \\
  \Rightarrow & Types(\Gamma) \leftarrow \ Types(\Gamma) \cup \{strid \to Type\}
 \end{align*}
 \\
