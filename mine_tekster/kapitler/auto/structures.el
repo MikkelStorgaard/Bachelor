@@ -14,6 +14,7 @@
     "subsec:checkingforduplicates"
     "chunks"
     "subsec:checkfunortype"
+    "checkingstructuredeclarations"
     "resolvelongname"
     "structuresincludes"
     "subsec:structuretests"

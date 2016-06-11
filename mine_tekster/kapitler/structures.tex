@@ -349,7 +349,7 @@ execution.\\
 5) The remainder of the declarations chunked in chompDecs is checked using
 checkDecs. Note, that the first element of \texttt{rest} must be a structure
 declaration, due to the implementation of chompDecs.
-\subsection{Checking structure declarations}
+\subsection{Checking structure declarations}\label{checkingstructuredeclarations}
 Please note that structures are currently called modules inside Futharks compiler.
 \begin{lstlisting}[language=Haskell]
 checkDecs (ModDec modd:rest) = do
@@ -533,6 +533,9 @@ and
 \label{subsec:structuresresults}
 The implementation of structures works, and I am satisfied with the results. As
 shown in the tests, the structures behave as prescribed in the rules\ref{structuresinterferencerules}.
+
+To answer the problem definition, it is definitely possible to add module
+functionality to Futhark, in terms of structure support.
 \subsection{Future work}
 \label{subsec:structuresfuturework}
 As mentioned in \ref{structureincludes}, it is possible to trigger a

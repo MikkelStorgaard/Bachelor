@@ -75,3 +75,58 @@ data SigBinding = FunSignature (Maybe (TypeDeclBase Info VName)) (TypeDeclBase I
                 -- A structure of signature sig, can itself be demanded to
                 -- contain a structure of some ModSignature
 \end{lstlisting}
+
+With the Signature defined, we need to extend the data type of the structure to
+accomodate the possibility of adding a signature to a structure:
+
+\begin{lstlisting}[language=Haskell]
+data ModDefBase f vn = ModDef { modName :: Name
+                              , modDecls :: [DecBase f vn]
+                              , modDefLocation  :: SrcLoc
+                              , modSignature :: Maybe LongName
+                              }
+\end{lstlisting}
+The parsed structure from the futhark program now has either
+\texttt{modSignature Nothing} , or \texttt{modSignature (Just }\textit{signature}\texttt{)}.
+
+We update checkMod from \ref{checkingstructuredeclarations} accordingly¸ by
+calling an extra function \texttt{verifyMod}:
+
+\begin{lstlisting}[language=Haskell]
+checkMod :: ModDefBase NoInfo VName -> TypeM (Scope , ModDefBase Info VName)
+checkMod (ModDef name decs loc sig) =
+  local (`addBreadcrumb` name) $ do
+    checkForDuplicateDecs decs
+    (scope, decs') <- checkDecs decs
+    verifyMod decs' sig loc
+    return (scope, ModDef name decs' loc sig)
+
+verifyMod :: [DecBase Info VName] -> Maybe LongName -> TypeM ()
+verifyMod _ Nothing _ = return ()
+verifyMod decs (Just sig) loc = do
+  sigtable <- asks (sigFromScope sig)
+  case sigtable of
+    Nothing -> throwError $ UndefinedLongName sig loc
+    Just t ->
+      foldM_ verifyDec decs $ HM.toList t
+\end{lstlisting}
+%$
+
+For each entry in the signature table, we call \mathtt{verifyDec} on this entry to
+verify, that decs contain a declaration that satisfies the signature table.
+
+As I have not implemented \texttt{verifyDec} completely yet, this implementation
+is not finished.
+
+\subsection{Results}
+As the signature implementation is \textit{incomplete}, I cannot claim that it
+is possible to implement module signatures in Futhark, by referring to tests.
+
+However, the current implementation lacks \textbf{only} a correct implementation of
+\texttt{verifyDec} before it works, barring some corrections of bugs that might
+show up during tests.
+The ongoing work on this feature can be followed on the \texttt{signatures}-branch in
+the public Futhark GitHub repo.
+
+To answer the question whether it is possible to implement module signatures in
+Futhark: Yes, it is. 
