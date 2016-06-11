@@ -1,1 +1,52 @@
 % pøls
+\section{Functors}
+\label{sec:functors}
+A function takes a number of arguments of specified types, and returns a value of some return type.
+A \textbf{functor} takes a structure\ref{structures} of a specified signature,
+and returns a structure of some signature.
+
+The concept is best explained through an example:
+\begin{lstlisting}[language=Haskell]
+  --
+  --==
+  -- input {}
+  -- output { 4 }
+
+  sig NumType {
+    type t
+    val add : (t,t) -> t
+    val subtract : (t,t) -> t
+    val divide : (t,t) -> t
+    val multiply : (t,t) -> t
+  }
+
+  struct Int {
+    type t = int
+    fun t add(t a, t b) = a + b
+    fun t subtract(t a, t b) = a - b
+    fun t divide(t a, t b) = a / b
+    fun t multiply(t a, t b) = a * b
+    
+  } : NumType
+
+  functor Doubler(number : NumType){
+    type t = number.t
+    fun t add(t a, t b) = number.add
+    fun t double(t a) = add(a,a) 
+  }
+
+  struct IntDoubler = Doubler(Int)
+
+  fun int main() = IntDoubler.double(2)
+\end{lstlisting}
+We first declare a signature, which defines the number type. We declare it so
+that there is a type t, that has four standard operations 
+
+
+%% how it works
+
+
+
+%% the reason is that WE CAN HAVE ALMOST POLYMORPHISM
+
+

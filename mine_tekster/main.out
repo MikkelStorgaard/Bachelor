@@ -25,25 +25,27 @@
 \BOOKMARK [1][-]{section.4}{Structures}{}% 25
 \BOOKMARK [2][-]{subsection.4.1}{Accessing types and functions within structures}{section.4}% 26
 \BOOKMARK [2][-]{subsection.4.2}{Interference rules}{section.4}% 27
-\BOOKMARK [3][-]{subsubsection.4.2.1}{Adding declarations to the environment}{subsection.4.2}% 28
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Interference rules for adding multiple declarations}{subsection.4.2}% 28
 \BOOKMARK [2][-]{subsection.4.3}{Interference rules for structure definitions}{section.4}% 29
-\BOOKMARK [3][-]{subsubsection.4.3.1}{Rule for multiple declarations of same name in same local environment:}{subsection.4.3}% 30
-\BOOKMARK [3][-]{subsubsection.4.3.2}{Rule for adding a structure to the local environment}{subsection.4.3}% 31
-\BOOKMARK [3][-]{subsubsection.4.3.3}{Rule for variable shadowing}{subsection.4.3}% 32
-\BOOKMARK [2][-]{subsection.4.4}{Interference rules for interpreting functions and types in an environment with structures}{section.4}% 33
-\BOOKMARK [2][-]{subsection.4.5}{Implementation}{section.4}% 34
-\BOOKMARK [3][-]{subsubsection.4.5.1}{The Scope datatype}{subsection.4.5}% 35
-\BOOKMARK [3][-]{subsubsection.4.5.2}{checkProg}{subsection.4.5}% 36
-\BOOKMARK [3][-]{subsubsection.4.5.3}{Checking for duplicates}{subsection.4.5}% 37
-\BOOKMARK [2][-]{subsection.4.6}{Dividing a Futhark program into chunks}{section.4}% 38
-\BOOKMARK [2][-]{subsection.4.7}{Checking function- and type declarations}{section.4}% 39
-\BOOKMARK [2][-]{subsection.4.8}{Checking structure declarations}{section.4}% 40
-\BOOKMARK [2][-]{subsection.4.9}{Resolving the application of a longname}{section.4}% 41
-\BOOKMARK [3][-]{subsubsection.4.9.1}{Including structures, functions and types from other files}{subsection.4.9}% 42
-\BOOKMARK [3][-]{subsubsection.4.9.2}{Keeping track of function names}{subsection.4.9}% 43
-\BOOKMARK [2][-]{subsection.4.10}{Tests}{section.4}% 44
-\BOOKMARK [3][-]{subsubsection.4.10.1}{Testing rule for multiple declarations [...]}{subsection.4.10}% 45
-\BOOKMARK [3][-]{subsubsection.4.10.2}{Testing structures can be called as expected}{subsection.4.10}% 46
-\BOOKMARK [3][-]{subsubsection.4.10.3}{Testing rule for variable shadowing}{subsection.4.10}% 47
-\BOOKMARK [2][-]{subsection.4.11}{Results}{section.4}% 48
-\BOOKMARK [2][-]{subsection.4.12}{Future work}{section.4}% 49
+\BOOKMARK [3][-]{subsubsection.4.3.1}{Rule for adding a structure to the local environment}{subsection.4.3}% 30
+\BOOKMARK [2][-]{subsection.4.4}{Interference rules for interpreting functions and types in an environment with structures}{section.4}% 31
+\BOOKMARK [2][-]{subsection.4.5}{Implementation}{section.4}% 32
+\BOOKMARK [3][-]{subsubsection.4.5.1}{The Scope datatype}{subsection.4.5}% 33
+\BOOKMARK [3][-]{subsubsection.4.5.2}{checkProg}{subsection.4.5}% 34
+\BOOKMARK [3][-]{subsubsection.4.5.3}{Checking for duplicates}{subsection.4.5}% 35
+\BOOKMARK [2][-]{subsection.4.6}{Dividing a Futhark program into chunks}{section.4}% 36
+\BOOKMARK [2][-]{subsection.4.7}{Checking function- and type declarations}{section.4}% 37
+\BOOKMARK [2][-]{subsection.4.8}{Checking structure declarations}{section.4}% 38
+\BOOKMARK [2][-]{subsection.4.9}{Resolving the application of a longname}{section.4}% 39
+\BOOKMARK [3][-]{subsubsection.4.9.1}{Including structures, functions and types from other files}{subsection.4.9}% 40
+\BOOKMARK [3][-]{subsubsection.4.9.2}{Keeping track of function names}{subsection.4.9}% 41
+\BOOKMARK [2][-]{subsection.4.10}{Tests}{section.4}% 42
+\BOOKMARK [3][-]{subsubsection.4.10.1}{Testing rule for multiple declarations [...]}{subsection.4.10}% 43
+\BOOKMARK [3][-]{subsubsection.4.10.2}{Testing structures can be called as expected}{subsection.4.10}% 44
+\BOOKMARK [3][-]{subsubsection.4.10.3}{Testing rule for variable shadowing}{subsection.4.10}% 45
+\BOOKMARK [2][-]{subsection.4.11}{Results}{section.4}% 46
+\BOOKMARK [2][-]{subsection.4.12}{Future work}{section.4}% 47
+\BOOKMARK [1][-]{section.5}{Signatures}{}% 48
+\BOOKMARK [2][-]{subsection.5.1}{Purpose of module signatures}{section.5}% 49
+\BOOKMARK [2][-]{subsection.5.2}{Implementation}{section.5}% 50
+\BOOKMARK [2][-]{subsection.5.3}{Results}{section.5}% 51

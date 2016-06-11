@@ -136,7 +136,7 @@ addition of any of these four elements follow a generalized rule:
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash Decl_1 \Rightarrow \Gamma' $ }
-      \AxiomC{ $\Gamma \not\vdash id \to decltype\ Decl_2$
+      \AxiomC{ $\Gamma \not\vdash id \to decltype\ Decl_2$ }
         \BinaryInfC{ $\Gamma \vdash$ \texttt{decltype} \textit{id }\texttt{=} \textit{decl} $\Rightarrow \{ id \to Decl \} $ }
       \end{prooftree}
     \end{tcolorbox}
@@ -154,8 +154,6 @@ multiple declarations in a row.
       \AxiomC{ $\Gamma \oplus \Gamma_1 \vdash Decl_2 \Rightarrow \Gamma_2 $}
         \BinaryInfC{ $\Gamma \vdash Decl_1 , Decl_2 \Rightarrow \Gamma_1 \oplus \Gamma_2$}
       \end{prooftree}
-      \\
-      \\
       For any $\Gamma$, $\Gamma_a \oplus \Gamma_b \Rightarrow \Gamma_a \cup \Gamma_b$
     \end{tcolorbox}
 \end{figure}
@@ -166,36 +164,27 @@ the same rule again on $Decl_2$, $Decl_3$.
 \\
 This procedure is repeated until the rule reaches the two last statements,
 $Decl_{n-1}$, $Decl_n$. 
-
 \subsection{Interference rules for structure definitions}
 We must take a closer look at what happens, when a structure is defined.
 The definition of a structure in Futhark has the following behaviour.
-\subsubsection{Rule for multiple declarations of same name in same local environment:}
-Building a structure from a list of \textit{structdecls} allows for several
-different declarations in the same environment of the same name, as long as
-it is different types of declarations:\\
-\\
-
-
 \subsubsection{Rule for adding a structure to the local environment}
-\begin{figure}\label{Rule3}
+\begin{figure}[h!]\label{Rule3}
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash strdecl \Rightarrow \Gamma'$ }
       \AxiomC{ $\Gamma \vdash strdecls \Rightarrow \Gamma_{strdecls}$}
       \AxiomC{ $\Gamma \oplus \Gamma_{strdecls} \vdash \Gamma_{strid}$}
-        \BinaryInfC{$\Gamma \vdash$ \texttt{struct} \textit{strid}
+        \TrinaryInfC{$\Gamma \vdash$ \texttt{struct} \textit{strid}
           \texttt{\{} \textit{strdecls} \texttt{\}}
           $\Rightarrow \{ strid \to \Gamma_{strid}\}$}
-    \end{prooftree}.
+    \end{prooftree}
     where $\Gamma \oplus \Gamma_{strdecls} \Rightarrow \Gamma \cup
     \Gamma_{strdecls}.$
     If there is a shared identifier in both $\Gamma$ and $\Gamma_{strdecls}$,
     the definition in $\Gamma_{strdecls}$ is the definition in $\Gamma_{strid}$.
   \end{tcolorbox}
 \end{figure}
-This means that Futhark exhibits variable shadowing, where definitions in some
-structure are valid in its nested structures, unless they are redefined.
+The consequence of defining $\Gamma_{strid}$ as a union of new declarations together with the old environment menas, that Futhark exhibits variable shadowing, where definitions in a structure are valid in its nested structures, unless they are redefined in the nested structure.
 
 \subsection{Interference rules for interpreting functions and types in an
   environment with structures}\label{interpretingfunctionsandtypeswithstructures}
