@@ -2,6 +2,8 @@
  "functors"
  (lambda ()
    (LaTeX-add-labels
-    "sec:functors"))
+    "sec:functors"
+    "subsec:reasonfunctors"
+    "subsec:implementing_functors"))
  :latex)
 

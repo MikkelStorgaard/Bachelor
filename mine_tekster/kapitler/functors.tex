@@ -39,14 +39,51 @@ The concept is best explained through an example:
 
   fun int main() = IntDoubler.double(2)
 \end{lstlisting}
-We first declare a signature, which defines the number type. We declare it so
-that there is a type t, that has four standard operations 
+We first declare a signature NumType, which defines the number type. We declare it so
+that there is a type t, that has four standard operations (add, subtract, divide
+and multiply.).
+\\
+\\
+We then declare a structure Int, which adheres to the NumType signature:
+The add function in Int uses the built-in functionality of the plus operator in
+Futhark, but could in principle be defined as whatever the programmer would
+like \emph as long as the type checks correctly.
 
+Then, the functor is defined: The functor takes a structure as an argument, and
+can then refer to this structure in the declarations of the functor, using
+dot-notation.
+The functor contains a list of type-, function- and structure declarations, just
+like the structure does.
+However, none of these declarations has to be defined inside the functor:
 
-%% how it works
+Any of the declarations can be loaded from the functor's argument instead!
 
+In the example above, the Doubler functor contains a function called
+\texttt{double}. But \texttt{double} is not defined inside the functor, but will
+instead become whatever the \texttt{double} function is defined as, inside the \texttt{number}
+argument of the functor.
+At the application of the Doubler functor, creating IntDoubler, we can
+guarantee, that our types still hold. This is because the function definitions
+in the functor has an abstract type\footnote{type t}, which is not instantiated
+until the functor can get the type definition from the structure argument.
 
+To boot, we can even bind a signature to functor if we want to. In that case, we
+will have to create a functor, that returns a structure of signature
+\textit{sig}, when it is applied.
+
+\subsection{The reason for functors}
+\label{subsec:reasonfunctors}
 
 %% the reason is that WE CAN HAVE ALMOST POLYMORPHISM
+
+
+
+
+
+\subsection{Implementing functors}
+\label{subsec:implementing_functors}
+Implementing a simple but 
+
+
 
 
