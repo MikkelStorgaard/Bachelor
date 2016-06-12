@@ -4,6 +4,7 @@
    (LaTeX-add-labels
     "sec:final_section"
     "subsec:label"
-    "subsec:method"))
+    "subsec:method"
+    "subsec:acknow"))
  :latex)
 

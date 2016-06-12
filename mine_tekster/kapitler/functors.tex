@@ -127,27 +127,58 @@ Futhark structure.
 
 In the following tentative implementation of functors in the Futhark
 typechecker, we have added a Functor definition to the Futhark syntax.\\
-Furthermore, ModDef have been expanded to allow functor application, checkDecs
+Furthermore, ModDef have been expanded to allow functor application, checkMod
 have been expanded to allow functor application, and checkFunctor has been added.
 
 \begin{lstlisting}[language=Haskell]
+  data ModDefBase f vn = ModDef { modName :: Name
+                                , modDecls :: ModInternal f vn
+                                , modDefLocation  :: SrcLoc
+                                , modSignature :: Maybe LongName
+                                }
+
+  data ModInternal f vn = ModDecls :: [DecBase f vn]
+                        | Functor :: ( functorName :: LongName
+                                     . argumentName :: LongName
+                                     )
+  
   data FunctorDefBase = FunctorDef { functorName :: Name
                                    , functorArg :: LongName
                                    , functorArgSig :: LongName
                                    , functorDecls :: [FunctorDeclBase f vn]
-                                   , functorSig :: Maybe LongName
                                    , functorDefLocation :: SrcLoc
                                    }
 
   ...
-                                   
-  checkFunctor :: FunctorDefBase f vn -> Name -> TypeM (Scope, ModDefBase Info VName)
-  checkFunctor functor structname =
-    argScope <- scopeFromEnv $ functorArg functor    
+                                     
+  checkMod :: ModDefBase NoInfo VName -> TypeM (Scope , ModDefBase Info VName)
+  checkMod (ModDef name (ModDecls decs) loc sig) =
+    local (`addBreadcrumb` name) $ do
+      checkForDuplicateDecs decs
+      (scope, decs') <- checkDecs decs
+      verifyMod decs' sig loc
+      return (scope, ModDef name decs' loc sig)
+
+  checkMod :: ModDefBase NoInfo VName -> TypeM (Scope , ModDefBase Info VName)
+  checkMod (ModDef name (Functor (functor, applicant) loc sig) =
+    local (`addBreadcrumb` name) $ do
+      applyFunctor functor applicant
+
+  
+  applyFunctor :: LongName -> LongName -> TypeM (Scope, ModDefBase Info VName)
+  applyFunctor functorname structname =
+    functor <- functorFromEnv functorname
+    argScope <- scopeFromEnv structname    
     verifyScope argScope $ functorArgSig functor
     (local (addModule argScope)) $ do
       decs <- resolveFunctorDecs $ functorDecls functor
-      (scope, decs') <- checkDecs decs
-      verifyMod decs' sig loc
-      return (scope, ModDef structname decs' (functorSig functor)  (functorDefLocation functor))
+      checkMod (ModDef structname (ModDecls decs) (functorSig functor) (functorDefLocation functor))
 \end{lstlisting}
+% $
+
+As our results from structures\ref{structuresresult} showed, that structures in
+Futhark behaved as we would expect, I will claim that this tentative solution
+works as well.
+applyFunctor doesn't do much else than resolving the abstract declarations of
+the functor, into a concrete set of declarations, which we DO know how to
+handle, using \texttt{checkDecs}.
