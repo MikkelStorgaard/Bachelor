@@ -4,35 +4,56 @@ mere bedre
 
 \section{Introduction}
 \label{sec:introduction}
-mere bedre
+This report describes the efforts in defining a concrete method of extending the Futhark Programming Language
+with a module system.
+A module system is here defined as a programming feature,
+which allows the programmer to package functionality into a discrete code
+package.
 
-\subsection{Problem definition}
-\label{subsec:probdef}
-Is it possible to implement a module system in Futhark, which displays features
-comparable to the module system implemented in Standard ML? \cite{sml modules}
-%% sml-henvisninger fra bogen måske?
+After a module has been defined, it can then be shared and utilized in any other
+program, by including it in these programs. Widely known modules include
+\texttt{NumPy}\footnote{\url{http://www.numpy.org/}}, the Python package for
+data modelling and computing, and \texttt{NLTK}\footnote{\url{http://nltk.org}},
+the Natural Language Toolkit (also for Python.)
 
+These suites can be downloaded and used in any Python project.
+
+A well written module can become very popular. In some cases, a programmers
+choice of programming language for a given project, can be decided by the number and quality of
+available, project relevant modules.
+
+\subsection{Choice of module system}
+The module system design for Futhark has been inspired by the module system
+implemented in Standard ML\cite{crash_course}. Not only does the Standard ML
+modules enable structures with predefined implementations.
+It also defines a system of \textit{functors\footnote{Not to be confused with neither mathematical
+  functors or functors from Haskell}}, which defines abstract implementations of
+structures.
+
+These abstract implementations of structures can be then be instantiated by
+applying the functor on an argument of a fitting signature.
+This makes it
+possible to write structures that does not commit to one certain type, but
+instead inherits the functionality defined in the given argument.
+
+This saves the developers for writing a lot of almost identical code. Refer to
+\ref{first_functor_example} for a simple example.
 \pagebreak
 \section{Motivation}
 \label{subsec:label}
+The Futhark language a very young language, and is therefore still very much in
+developement.
+Extending this language to support modules would increase the usability of
+Futhark, which could be a factor in expanding the user base and user retention
+of Futhark.
+
 The implementation of a module system, will greatly expand the usability of
 Futhark, without having side effects on the performance of the compiled Futhark code.
 The following subsections contain the features this project is implementing, and
 examples of why these features are desirable.\\
 
-To be able to claim, that modules increases usability, we must first
-setup some metrics of usability.
-\\
-\\
-\textbf{Readability increases usability:}\\
-skriv mere her\\
-\textbf{Compartmentalization of functionality increases usability:}\\
-skriv mere her\\
-\textbf{A module system increases the ability to share code between developers.}\\
-skriv mere her
-
 \subsection{Abstraction increases readability.} 
-In example, type aliasing lets us abstract
+Type aliasing lets us abstract
 from the actual definition of data types.
 When writing our source code, we can define our type aliases before writing the
 rest of our program.
@@ -82,6 +103,12 @@ instead of tuples.
 \\
 The end result is a shorter, more readable program~\ref{nbody}
 
+\subsection{Compartmentalization of functionality increases usability:}\\
+Splitting code functionality into multiple files, will allow the programmer to
+compile and type check these modules individually. The programmer can edit and
+contribute to these files independantly of the programs which includes these
+modules.
+
 \subsection{Approximating higher order functionality whilst keeping performance}
 \label{subsec:higherorderfunctionality}
 It is possible to express higher-order functionality in Futhark, without taking
@@ -93,14 +120,13 @@ First we repeat the three-dimensional vector module
 from earlier, but without declaring any particular
 primitive \ref{futharks_types} type as the contained type of the vector:
 \begin{verbatim}
-  structure Vec3 = 
-    struct
+  struct Vec3 {
       type vector = {t, t, t}
       fun vector add( ... ) = ...
       fun vector subtract( ... ) = ...
       fun vector multiply ( ... ) = ...
       fun vector divide ( ... ) = ...
-    end
+  }
 \end{verbatim}
 \noindent
 The structure above cannot be used on its own. Type \texttt{t} is not
@@ -109,8 +135,12 @@ instantiated, and the module cannot be type checked, which causes an error.
 \noindent
 We can solve that problem, by instantiating the abstract structure, using a
 simple functor; the \texttt{where}-clause.
+\label{first_functor_example}
 \begin{verbatim}
-  structure IntVec3 = Vec3 where type t = int
+  struct Int {
+    type t = int 
+  }
+  struct IntVec3 = Vec3(Int)
 \end{verbatim}
 \noindent
 We can now access the structure \texttt{IntVec3} throughout the rest of the
@@ -136,23 +166,26 @@ scope. \ref{structuresincludes}
 The entire program is then compiled, and the optimizations that makes FUTHARK \texttt{GO
 FAST } are applied to the included modules as well as the top level declarations.
 
+\subsection{Problem definition}
+\label{subsec:probdef}
+Is it possible to implement a module system in Futhark, which displays features
+comparable to the module system implemented in Standard ML? \cite{crash_course}.
+
 \subsection{Scope of project}
 \label{subsec:project_scope}
 The scope of the project is
 \begin{itemize}
-  \item to implement a type aliasing system in Futhark
-  \item to implement a module system in Futhark, which has:
+  \item to define and implement a type aliasing system in Futhark
+  \item to define and implement a module system in Futhark, which has:
     \begin{itemize}
       \item The definition of structures containing types and functions
       \item Nested modules; meaning that any structure can contain a structure
       \item A well defined way of referring to types, structures and functions
         contained in a structure
     \end{itemize}
-  \item to implement functor functionality, so that Futhark supports the
+  \item to research the possibility of implementing functor functionality, so that Futhark supports the
     definition of abstract structures and concretizations of these structures.
+    \\
+    A suggested design for the implementation of functors should be part of this project.
 \end{itemize}
-
-\subsection{Success definitions}
-\label{subsec:label}
-fyld-ud
 \clearpage

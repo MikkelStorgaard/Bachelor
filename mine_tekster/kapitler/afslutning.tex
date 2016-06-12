@@ -1,0 +1,80 @@
+\section{Final section}
+\label{sec:final_section}
+
+\subsection{Discussion of results}
+\label{subsec:label}
+
+\subsection{Method}
+\label{subsec:method}
+The developement of the features implemented during this project has generally
+followed three phases.\\
+For each of the features, I have initially sat down with both my supervisor and
+my ``code supervisor'' to discuss both the behaviour, and the implementation of
+the features. After having decided on which features we would like each part of
+the project to exhibit, we have shortly discussed a strategy for implementing
+this.
+
+After these initial design meetings, I have been implementing the designs in the
+Futhark compiler itself. As the extensions I have made to Futhark have been
+implemented all the way into the Futhark parser, the step from initial code
+changes to a test-driven developement has been slightly long.
+\\
+In the beginning of this project, it took me several weeks from the first change to the program, until
+I had code that would compile again. This was mostly caused by me being very
+new to the futhark code base. Over time, this was definitely alleviated by me
+becoming much more confident in Futhark developement.
+\\
+At a certain point in the developement cycle of each feature, the implementation
+reached an almost finished state: The code would compile, and the initial
+parsing tests for the given feature would compile correctly. At this point, I
+could commence actual test driven developement:
+\\
+\\
+My method was now to define tests that corresponded to the interference rules
+which were declared for the feature in question. Whilst the code \textit{would}
+compile at this stage, I reiterated on the implementation to fix mistakes in the
+code.
+I.e. type checking would perform correctly in a test program, but the program
+would exhibit behaviour that was not defined by an interference rule, nor
+desirable in the context of program.
+\\
+Any number of tests could be written to test a feature implementation, but I
+concentrated mainly on white box testing, which are attempts to write tests that
+breaks the implementation, or makes the implementation show undefined behaviour.
+\\
+\\
+After completing the implementation of a feature, I would document the addition
+to the Futhark language in the Futhark language reference documents, and merge
+the git feature branch with master.
+
+\subsection{Conclusion}
+Implementing a simple Standard ML style module system is not only theoretically
+possible, but should be within reach of the Futhark project, given a couple of
+weeks' more of developement time.
+\\
+At the time of this report, it has not been finished solely due to time constraints.
+\\
+\\
+Both the type aliasing system and the basic structure implementation developed
+during this project, has been designed around a set of interference rules.
+Tests were designed to control whether these rules were obeyed by the actual
+implementation of the type system.
+For both type aliasing and structures, the final iterations of program showed
+that the implementations \textit{did} work as defined in the interference rules.
+
+Although the module signatures were not implemented in time, all the information
+needed to perform a signature check at compile time, is present. A correct
+implementation is indeed just a question of writing a function, that verifies
+the type signature of a declaration correctly.
+\\
+The implementation of the functor functionality itself was not completed either,
+but a hypothetical implementation has been described in this report.
+As the hypothetical implementation has been described from a good background knowledge
+of the relevant parts of the Futhark implementation, I see no immediate reason,
+that this implementation should not work \emph barring a complete redesign of
+the Futhark implementation.
+
+\subsection{Acknowledgements}
+\label{subsec:label}
+Lasse Madsen for NLTK, Helena Bach for OpenCV
+j
