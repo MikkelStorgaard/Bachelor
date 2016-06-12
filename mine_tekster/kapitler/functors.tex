@@ -73,17 +73,81 @@ will have to create a functor, that returns a structure of signature
 
 \subsection{The reason for functors}
 \label{subsec:reasonfunctors}
-
+As explained in the introduction of this report\ref{higherorderfunctionality},
+functors allows the programmer to write modules with abstract structures,
+defining some functionality.
 %% the reason is that WE CAN HAVE ALMOST POLYMORPHISM
+Functors does not give us actual polymorphism in our programs, but it
+\emph{does} allow us to generalize functionality, when it is not tied to any
+specific type traits.
 
-
-
-
-
-\subsection{Implementing functors}
+\subsection{Tentative implementation of functors}
 \label{subsec:implementing_functors}
-Implementing a simple but 
+Implementing a simple functor which instantiates a structure on application,
+should not be very difficult.
 
+On a base level, building a structure from a functor and its argument is a
+question of parsing the functor's declaration in the right order.\\
+At the time of the functor declaration of some functor
+\texttt{functor Funct(}\textit{argument} \texttt{:}
+\textit{signature}\texttt{)\{ \textit{Functdecls} \}} \, we do not
+know anything about the types of the declarations in \textit{Functdecls}.
 
+We cannot type check this functor yet, so we will instead build a functor,
+which contains similar declarations to what the structure contains.
+However, we allow for abstract declarations of both types, functions and
+structures, such as:
+\begin{lstlisting}
+  functor S(str : sig){
+    type a = str.t
+    fun a foo(a left, a right) = str.bar(left,right)
+    struct M0 = str.mystruct
+  }
+\end{lstlisting}
+We also allow for function declarations with calls to abstract functions:
+\begin{lstlisting}
+  functor S(str : sig){
+    fun int baz = 2 + str.function()
+  }
+\end{lstlisting}
 
+Thus we will not handle the functor any further, until it is attempted to be
+applied to a structure somewhere in the program. At the application of the
+functor on some structure \textit{str}, \textit{str} is assumed to be in scope.
+\\\\
+Our goal now is to convert the applied functor into a structure. This will
+happen during checkDecs.
+After applying the functor, we will not have any need
+for the functor declaration.
+Instead, we need a ModDec in the rest of the program, because the Futhark
+internalises the program functions on basis of function declarations, which are
+read from the actual function declarations \texttt{FunDec}, which are stored
+either in the top level decl list, or in the declaration list contained in a
+Futhark structure.
 
+In the following tentative implementation of functors in the Futhark
+typechecker, we have added a Functor definition to the Futhark syntax.\\
+Furthermore, ModDef have been expanded to allow functor application, checkDecs
+have been expanded to allow functor application, and checkFunctor has been added.
+
+\begin{lstlisting}[language=Haskell]
+  data FunctorDefBase = FunctorDef { functorName :: Name
+                                   , functorArg :: LongName
+                                   , functorArgSig :: LongName
+                                   , functorDecls :: [FunctorDeclBase f vn]
+                                   , functorSig :: Maybe LongName
+                                   , functorDefLocation :: SrcLoc
+                                   }
+
+  ...
+                                   
+  checkFunctor :: FunctorDefBase f vn -> Name -> TypeM (Scope, ModDefBase Info VName)
+  checkFunctor functor structname =
+    argScope <- scopeFromEnv $ functorArg functor    
+    verifyScope argScope $ functorArgSig functor
+    (local (addModule argScope)) $ do
+      decs <- resolveFunctorDecs $ functorDecls functor
+      (scope, decs') <- checkDecs decs
+      verifyMod decs' sig loc
+      return (scope, ModDef structname decs' (functorSig functor)  (functorDefLocation functor))
+\end{lstlisting}
