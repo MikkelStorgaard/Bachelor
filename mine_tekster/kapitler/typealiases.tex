@@ -239,7 +239,6 @@ environment is used to keep check of cyclical definitions as described in
 For each type alias, we use the function \texttt{process} to resolve the type, and modify
 the scope contained within the state monad of the ReaderT.
 \\
-\\
 Resolving a type from a type aliasing is done using the function \texttt{typeOfName} in
 the code snippet\ref{typealiasingcode}. \texttt{typeOfName} tries to
 resolve the type by name by retrieving the scope contained in the transformed

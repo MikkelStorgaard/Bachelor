@@ -4,7 +4,8 @@
 A function takes a number of arguments of specified types, and returns a value of some return type.
 A \textbf{functor} takes a structure\ref{structures} of a specified signature,
 and returns a structure of some signature.
-
+\\
+\\
 The concept is best explained through an example:
 \begin{lstlisting}[language=Haskell]
   --
@@ -48,16 +49,18 @@ We then declare a structure Int, which adheres to the NumType signature:
 The add function in Int uses the built-in functionality of the plus operator in
 Futhark, but could in principle be defined as whatever the programmer would
 like \emph as long as the type checks correctly.
-
+\\
+\\
 Then, the functor is defined: The functor takes a structure as an argument, and
 can then refer to this structure in the declarations of the functor, using
 dot-notation.
 The functor contains a list of type-, function- and structure declarations, just
 like the structure does.
-However, none of these declarations has to be defined inside the functor:
-
-Any of the declarations can be loaded from the functor's argument instead!
-
+\\
+\\
+However, none of these declarations has to be defined inside the functor: any of the declarations can be loaded from the functor's argument instead.
+\\
+\\
 In the example above, the Doubler functor contains a function called
 \texttt{double}. But \texttt{double} is not defined inside the functor, but will
 instead become whatever the \texttt{double} function is defined as, inside the \texttt{number}

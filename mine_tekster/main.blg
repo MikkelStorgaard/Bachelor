@@ -1,20 +1,15 @@
 This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
-White space in argument---line 19 of file main.aux
- : \citation{sml
- :               modules}
-I'm skipping whatever remains of this command
 I couldn't open style file te.bst
 ---line 133 of file main.aux
  : \bibstyle{te
  :             }
 I'm skipping whatever remains of this command
-I found no cite keys---while reading file main.aux
 I found no style file---while reading file main.aux
-You've used 0 entries,
+You've used 1 entry,
             0 wiz_defined-function locations,
-            85 strings with 494 characters,
+            86 strings with 506 characters,
 and the built_in function-call counts, 0 in all, are:
 = -- 0
 > -- 0
@@ -53,4 +48,4 @@ warning$ -- 0
 while$ -- 0
 width$ -- 0
 write$ -- 0
-(There were 4 error messages)
+(There were 2 error messages)

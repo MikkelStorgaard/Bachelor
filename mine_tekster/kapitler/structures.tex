@@ -101,7 +101,6 @@ Type aliases, signatures, structures and functors are described in their respect
 sections.\\
 A structure can be regarded as a structure name and an environment contained in the structure, so that
 $\{strid \to \Gamma_{strid}\}$ is a mapping in \textit{STRUCTE}.
-\clearpage
 Any $\Gamma_{strid}$ contains its own function-, typealias-, signature-, structure- and functor declarations.\\
 \\
 
@@ -310,6 +309,7 @@ chompDecs decs = f ([], decs)
   where f (foo , FunOrTypeDec dec : xs ) = f (dec:foo , xs)
         f (foo , bar) = (foo, bar)
 \end{lstlisting}
+\clearpage
 \subsubsection{Checking function- and type declarations}
 \label{subsec:checkfunortype}
 \begin{lstlisting}[language=Haskell, numbers=left]
@@ -336,7 +336,7 @@ execution.\\
 4) checkFunOrTypeDec does the actual typechecking of the function declaration. \\
 5) The remainder of the declarations chunked in chompDecs is checked using
 checkDecs. Note, that the first element of \texttt{rest} must be a structure
-declaration, due to the implementation of chompDecs.
+declaration, due to the implementation of chompDecs.\\
 \subsubsection{Checking structure declarations}\label{checkingstructuredeclarations}
 Please note that structures are currently called modules inside Futharks compiler.
 \begin{lstlisting}[language=Haskell]
@@ -405,15 +405,16 @@ Figure \ref{resolvelongname} shows the implementation of the longname rule
 \subsubsection{Including structures, functions and types from other files}\label{structuresincludes}
 The Futhark \texttt{include}-statement lets the user include
 other files into the current program.
-
+\\
 This is implemented by letting the Futhark compiler combine the source code from
 all the included files, with the declarations in the main program. The combined
 program is then sent passed on through the rest of the compiler.
-
+\\
 As the Futhark program with an arbitrary number of includes is merged into a
 single program within the compiler, we can compartmentalize a program into
 discrete files.
-
+\\
+\\
 However, this creates a hazard: there might be declarations in the included
 code, which has names that overlap with names in the remaining code, so that a
 \texttt{DuplicateDefinitionError} is triggered. the included code has any declarations
@@ -438,7 +439,7 @@ structures it was defined in.
 To verify that the implementation of structures was correct, a series of test
 programs were written to verify, whether the interference rules defined for the
 structures, actually held in an executed Futhark program.
-
+\\
 Having writting the structure implementation myself, I have been able to
 consider my testing options. I have had the choice of writing either \textit{white box}
 tests, \textit{black box }tests, or both.
@@ -455,10 +456,9 @@ Black box tests are written without knowledge of the code behind the program.
 In the context of Futhark structures, this limits the test writer to test,
 whether the rules which are specified in \ref{structuresinterferencerules} holds
 in the actual implementation.
-
+\\\\
 In the following tests, programs which break the rules are expected to return
 with an error.
-
 \subsubsection{Testing rule for multiple declarations [...]}
 The following tests are implemented to test whether rule \ref{Rule4} holds.
 \texttt{duplicate\_def0.fut}:
@@ -468,18 +468,20 @@ This test passes.
 In the following test, the structure foo contains declarations of name foo also.
 This is a white box test to ensure, that the implementation handles type, struct
 and fun declarations in seperate tables.
+\\
 \texttt{duplicate\_def1.fut}:
 \lstinputlisting[language=Haskell]{./tests/duplicate_def1.fut}
 This test passes.
 \\
 In the following tests, the programmer has attempted to declare functions and
 types in the same environment, twice.
-
+\\
 \texttt{duplicate\_error0.fut}:
 \lstinputlisting[language=Haskell]{./tests/duplicate_error0.fut}
 This test passes.
 \\
 In the following test, the structure foo contains declarations of name foo also.
+\\
 \texttt{duplicate\_error1.fut}:
 \lstinputlisting[language=Haskell]{./tests/duplicate_error1.fut}
 This test passes.
@@ -487,36 +489,44 @@ This test passes.
 \subsubsection{Testing structures can be called as expected}
 The following tests are implemented to test that calling structures works as
 defined in rule \ref{Rule5}.
-
+\\
 \texttt{calling\_nested\_module.fut}:
 \lstinputlisting[language=Haskell]{./tests/calling_nested_module.fut}
 This test passes.
 \\
-Currying functions such as map and reduce works as expected:\\
+Currying functions such as map and reduce works as expected:
+\\
 \texttt{map\_with\_structure0.fut}:
 \lstinputlisting[language=Haskell]{./tests/map_with_structure0.fut}
 This test passes.
 \\
-Using structures from an include works as expected:\\
+Using structures from an include works as expected:
+\\
 \texttt{Vec3.fut}:
 \lstinputlisting[language=Haskell]{./tests/Vec3.fut}
 \lstinputlisting[language=Haskell]{./tests/triangles.fut}
 This test passes.
+\clearpage
+
 \subsubsection{Testing rule for variable shadowing}
 The following tests are implemented to test whether the rule \ref{Rule4a} holds:
-Simple shadowing for functions holds:\\
+Simple shadowing for functions holds:
+\\
 \texttt{shadowing0.fut}:
 \lstinputlisting[language=Haskell]{./tests/shadowing0.fut}
-Simple shadowing for types holds:\\
+Simple shadowing for types holds:
+\\
 \texttt{shadowing1.fut}:
 \lstinputlisting[language=Haskell]{./tests/shadowing1.fut}
 This test shows, that structures are only read into scope, after they are fully parsed.
+\\
 \texttt{shadowing2.fut}:
 \lstinputlisting[language=Haskell]{./tests/shadowing2.fut}
 and
+\\
 \texttt{undefined\_structure\_err0.fut}:
 \lstinputlisting[language=Haskell]{./tests/undefined_structure_err0.fut}
-
+\clearpage
 \subsection{Results}
 \label{subsec:structuresresults}
 The implementation of structures works, and I am satisfied with the results. As

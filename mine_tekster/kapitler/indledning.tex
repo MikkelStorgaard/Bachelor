@@ -1,44 +1,41 @@
-\subsection*{Abstract}
-\label{subsec:abstract}
-mere bedre
-
-The reader is expected to have experience with statically typed languages,
-functional programming, and preferable the Haskell programming language.
 \section{Introduction}
 \label{sec:introduction}
-This report describes the efforts in defining a concrete method of extending the Futhark Programming Language
-with a module system.
+This report describes the efforts in defining a concrete method of extending the Futhark Programming Language with a module system.
 A module system is here defined as a programming feature,
 which allows the programmer to package functionality into a discrete code
 package.
-
+\\\\
 After a module has been defined, it can then be shared and utilized in any other
 program, by including it in these programs. Widely known modules include
 \texttt{NumPy}\footnote{\url{http://www.numpy.org/}}, the Python package for
 data modelling and computing, and \texttt{NLTK}\footnote{\url{http://nltk.org}},
 the Natural Language Toolkit (also for Python.)
-
+\\
 These suites can be downloaded and used in any Python project.
-
+\\
+\\
 A well written module can become very popular. In some cases, a programmers
 choice of programming language for a given project, can be decided by the number and quality of
 available, project relevant modules.
-
-\subsubsection{Choice of module system}
+\\
+\\
+\\
 The module system design for Futhark has been inspired by the module system
 implemented in Standard ML\cite{crash_course}. Not only does the Standard ML
 modules enable structures with predefined implementations.
 It also defines a system of \textit{functors\footnote{Not to be confused with neither mathematical
   functors or functors from Haskell}}, which defines abstract implementations of
 structures.
-
+\\
+\\
 These abstract implementations of structures can be then be instantiated by
 applying the functor on an argument of a fitting signature.
 This makes it
 possible to write structures that does not commit to one certain type, but
 instead inherits the functionality defined in the given argument.
-
-This saves the developers for writing a lot of almost identical code. Refer to
+\\
+\\
+This spares the developers for writing a lot of almost identical code. Refer to
 \ref{first_functor_example} for a simple example.
 \pagebreak
 \subsection{Motivation}
@@ -48,12 +45,12 @@ developement.
 Extending this language to support modules would increase the usability of
 Futhark, which could be a factor in expanding the user base and user retention
 of Futhark.
-
+\\
+\\
 The implementation of a module system, will greatly expand the usability of
 Futhark, without having side effects on the performance of the compiled Futhark code.
 The following subsections contain the features this project is implementing, and
-examples of why these features are desirable.\\
-
+examples of why these features are desirable.
 \subsubsection{Abstraction increases readability.} 
 Type aliasing lets us abstract
 from the actual definition of data types.
@@ -63,9 +60,8 @@ rest of our program.
 If we want to define a sphere in a three dimensional space, we want to define it
 with \\
 \textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
-moving. 
-Let us define a function that multiplies the speed of the sphere by a factor k.
-\begin{figure}[h]
+moving.\\
+Let us define a function that multiplies the speed of the sphere by a factor k:
 \begin{lstlisting}
 fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 	{f32 r, 
@@ -74,8 +70,6 @@ fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 	  =
     {r, {x_pos, y_pos, z_pos}, {k * x_dir , k * y_dir, k * z_dir }}
 \end{lstlisting}
-\end{figure}
-\clearpage
 \noindent
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
@@ -112,12 +106,12 @@ contribute to these files independantly of the programs which includes these
 modules.
 
 \subsubsection{Approximating higher order functionality whilst keeping performance}
-\label{subsec:higherorderfunctionality}j
+\label{subsec:higherorderfunctionality}
 It is possible to express higher-order functionality in Futhark, without taking
 a performance hit in the compiled Futhark code.
 %% reference to slow higher order functionality
 We will reiterate on the concept of modules\ref{sec:structures}, by introducing
-the concept of functors.
+the concept of functors.\\
 First we repeat the three-dimensional vector module
 from earlier, but without declaring any particular
 primitive \ref{futharks_types} type as the contained type of the vector:
@@ -156,18 +150,8 @@ of type \texttt{t} in \texttt{Vec3} is exchanged with type \texttt{int}.
 structure \textbf{ONCE}, and lets us instantiate this structure any number of
 times, each time with our own type.
 \\
-This functionality will be elaborated on in a later section Functors\ref{functors}. 
 \\
-\\
-From a performance-concerned point of view, the module system is desirable.
-Every function in the written program, whether it is inside a structure
-or defined in the top level program, is ultimately accumulated into the same
-scope. \ref{structuresincludes}.
-\\
-\\
-The entire program is then compiled, and the optimizations that makes FUTHARK \texttt{GO
-FAST } are applied to the included structures as well as the top level declarations.
-
+From a performance-concerned point of view, the module system is desirable, as the Futhark compiler handles all used and included structures at compile time.
 \subsection{Problem definition}
 \label{subsec:probdef}
 Is it possible to implement a module system in Futhark, which displays features
@@ -194,20 +178,22 @@ The scope of the project is
 \subsection{Related work}
 Futhark modules are designed with Standard MLs module system in mind. Thus, \textit{The
 Definition of Standard ML '97} \ref{definition} has been a source of inspiration
-for the behaviour of the Futhark module system. However, I have not read the
-code implementation of SML modules. My code supervisor and I did not find it
-necessary to lean on the SML implementation of modules: The Futhark compiler
-could readily support extensions to the language, and it was not difficult to
+for the behaviour of the Futhark module system. \\
+However, I have not read the code implementation of SML modules. My code supervisor and I did not find it necessary to lean on the SML implementation of modules:\\
+The Futhark compiler could readily support extensions to the language, and it was not difficult to
 figure out a way to implement the module system.
 \\
 \\
-Implementing SML modules in languages that are not SML is not unheard of. Yawar
-Amin\ref{scala_modules} has shown a way of implementing SML modules in Scala
-language.
-However, he was able to exploit functionality that was already available in
-Scala, to create his module system. Mainly, he was able to use Scala
-\texttt{functions} (in a comparable way to functors) to create new Scala
+Implementing SML modules in other languages is not a unique idea:\\
+Amin\ref{scala_modules}Yaraw has shown a way of implementing SML modules in Scala
+language. However, he was able to exploit functionality that was already available in
+Scala, to create his module system.
+\\
+\\
+Mainly, he was able to use Scala \texttt{functions} as functors to create new Scala
 \texttt{classes} (comparable to structures), just as Scala
-\texttt{traits} (comparable to signatures) was also built-in in Scala.\\
+\texttt{traits} were used for implementing signatures.
+\\
+\\
 Futhark had neither functions (for structures), structures or signatures at the
 beginning of the project, which made these necessary to add to the compiler itself.
