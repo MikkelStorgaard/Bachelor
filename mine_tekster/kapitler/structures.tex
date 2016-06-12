@@ -1,6 +1,6 @@
 \section{Structures}
 \label{sec:structures}
-\textbf{Introduction to structures:}
+\textbf{Introduction to structures:}\\
 \label{subsec:structuresaregood}
 Without structures, every function and type in futhark shares the same scope.
 Implementing modules lets us create functions that are alike, but keeps
@@ -85,7 +85,7 @@ the accessing types and functions in structures.
 
 
 \end{tcolorbox}
-\subsection{Accessing types and functions within structures}
+\subsubsection{Accessing types and functions within structures}
 To work with type aliases and modules, we need to define the internal
 environment of Futhark during compile time.\\
 \\
@@ -164,7 +164,6 @@ the same rule again on $Decl_2$, $Decl_3$.
 \\
 This procedure is repeated until the rule reaches the two last statements,
 $Decl_{n-1}$, $Decl_n$. 
-\subsection{Interference rules for structure definitions}
 We must take a closer look at what happens, when a structure is defined.
 The definition of a structure in Futhark has the following behaviour.
 \subsubsection{Rule for adding a structure to the local environment}
@@ -186,7 +185,7 @@ The definition of a structure in Futhark has the following behaviour.
 \end{figure}
 The consequence of defining $\Gamma_{strid}$ as a union of new declarations together with the old environment menas, that Futhark exhibits variable shadowing, where definitions in a structure are valid in its nested structures, unless they are redefined in the nested structure.
 
-\subsection{Interference rules for interpreting functions and types in an
+\subsubsection{Interference rules for interpreting functions and types in an
   environment with structures}\label{interpretingfunctionsandtypeswithstructures}
 There are three cases where it is necessary to resolve a function or a type from a
 longname:\\
@@ -273,7 +272,7 @@ checkForDuplicateDecs decs = do
         _ -> return $ HM.insert name dec known
 \end{lstlisting}
       %$
-\subsection{Dividing a Futhark program into chunks}
+\subsubsection{Dividing a Futhark program into chunks}
 To facilitate variable shadowing, it was necessary to split a parsed Futhark
 program into chunks.
 \\
@@ -311,7 +310,7 @@ chompDecs decs = f ([], decs)
   where f (foo , FunOrTypeDec dec : xs ) = f (dec:foo , xs)
         f (foo , bar) = (foo, bar)
 \end{lstlisting}
-\subsection{Checking function- and type declarations}
+\subsubsection{Checking function- and type declarations}
 \label{subsec:checkfunortype}
 \begin{lstlisting}[language=Haskell, numbers=left]
 checkDecs :: [DecBase NoInfo VName] -> TypeM (Scope, [DecBase Info VName])
@@ -338,7 +337,7 @@ execution.\\
 5) The remainder of the declarations chunked in chompDecs is checked using
 checkDecs. Note, that the first element of \texttt{rest} must be a structure
 declaration, due to the implementation of chompDecs.
-\subsection{Checking structure declarations}\label{checkingstructuredeclarations}
+\subsubsection{Checking structure declarations}\label{checkingstructuredeclarations}
 Please note that structures are currently called modules inside Futharks compiler.
 \begin{lstlisting}[language=Haskell]
 checkDecs (ModDec modd:rest) = do
@@ -370,7 +369,7 @@ $\Gamma_{strdecls} \Rightarrow \Gamma_{strid}$ is implemented.
 After the environment has been given its name, the internal declaration of the
 structure is read using \texttt{checkDecs}.
 \\
-\subsection{Resolving the application of a longname}
+\subsubsection{Resolving the application of a longname}
 Resolving the application for a longname is done through two short recursive
 functions.
 \\
@@ -525,6 +524,14 @@ shown in the tests, the structures behave as prescribed in the rules\ref{structu
 
 To answer the problem definition, it is definitely possible to add module
 functionality to Futhark, in terms of structure support.
+
+The extensions to the Futhark compiler in the TypeChecker.hs-module have had perfect compatibility with the rest
+of the Futhark, as all of the type aliases, structures and so on, are dealt with
+in the TypeChecker, which returns a typechecked Futhark program to the Futhark
+internaliser.
+
+Besides two small fixes in Internalise.hs, it has not been necessary to change
+any part of the Futhark compiler pipeline, after the TypeChecker step.
 \subsection{Future work}
 \label{subsec:structuresfuturework}
 As mentioned in \ref{structureincludes}, it is possible to trigger a

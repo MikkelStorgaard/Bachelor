@@ -7,6 +7,7 @@
     "sml_book"
     "functors"
     "typealias_commit"
-    "structure_commit"))
+    "structure_commit"
+    "scala_modules"))
  :bibtex)
 
