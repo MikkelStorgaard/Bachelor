@@ -2,7 +2,6 @@
  "indledning"
  (lambda ()
    (LaTeX-add-labels
-    "subsec:abstract"
     "sec:introduction"
     "subsec:label"
     "subsec:higherorderfunctionality"

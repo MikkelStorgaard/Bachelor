@@ -10,21 +10,34 @@
    (add-to-list 'LaTeX-verbatim-macros-with-delims-local "lstinline")
    (TeX-run-style-hooks
     "latex2e"
+    "./kapitler/indledning"
+    "./kapitler/typealiases"
+    "./kapitler/structures"
+    "./kapitler/signatures"
+    "./kapitler/functors"
+    "./kapitler/afslutning"
     "article"
     "art12"
     "graphicx"
     "import"
     "caption"
+    "hyperref"
     "subcaption"
     "pgffor"
     "amssymb"
     "listings"
     "tcolorbox"
     "amsmath"
+    "bussproofs"
     "inputenc"
     "dsfont"
     "relsize"
     "float"
-    "geometry"))
+    "courier"
+    "geometry")
+   (LaTeX-add-labels
+    "subsec:abstract")
+   (LaTeX-add-bibliographies
+    "litteratur"))
  :latex)
 

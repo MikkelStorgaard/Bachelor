@@ -37,6 +37,12 @@ instead inherits the functionality defined in the given argument.
 \\
 This spares the developers for writing a lot of almost identical code. Refer to
 \ref{first_functor_example} for a simple example.
+\\
+\\
+\textbf{Reader expectations}:\\
+The reader is expected to have experience with statically typed languages,
+functional programming, and preferable the Haskell programming language.
+
 \pagebreak
 \subsection{Motivation}
 \label{subsec:label}
@@ -52,8 +58,7 @@ Futhark, without having side effects on the performance of the compiled Futhark 
 The following subsections contain the features this project is implementing, and
 examples of why these features are desirable.
 \subsubsection{Abstraction increases readability.} 
-Type aliasing lets us abstract
-from the actual definition of data types.
+Type aliasing lets us abstract from the actual definition of data types.
 When writing our source code, we can define our type aliases before writing the
 rest of our program.
 %% skriv bedre
@@ -75,7 +80,7 @@ With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
 Coupled with helper functions, we can now multiply the speed of the sphere like
 this:
-\begin{figure}[h]
+\begin{figure}
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
 type position, direction = vec3 
@@ -97,7 +102,7 @@ match on the type aliased values contained in the sphere type.
 Most importantly, the vectors of the sphere are abstracized into a single variables
 instead of tuples.
 \\
-The end result is a shorter, more readable program~\ref{nbody}
+The end result is a shorter, more readable program~\ref{nbody_after}
 
 \subsubsection{Compartmentalization of functionality increases usability:}
 Splitting code functionality into multiple files, will allow the programmer to

@@ -1,8 +1,35 @@
-\section{Final section}
+\section{Discussion of results}
 \label{sec:final_section}
 
-\subsection{Discussion of results}
-\label{subsec:label}
+Both the type aliasing system and the basic structure implementation developed
+during this project, has been designed around a set of interference rules.
+Tests were designed to measure whether these rules were obeyed by the actual
+implementation of the type system.
+For both type aliasing and structures, the final iterations of program showed
+that the implementations \textit{did} work as defined in the interference rules.
+\\
+\\
+As my final implementations of the two first features failed neither any of the
+feature-specific tests, nor any test in the Futhark test suite, or any of the
+Futhark benchmark programs\ref{futhark_benchmarks}, I \textit{will} claim, that
+it is possible to extend the Futhark language, and that I am able to succesfully
+add features to the code base.
+\\
+\\
+These results suggests that the two remaining features should be quite possible
+to implement as well:\\
+Although the module signatures were not implemented in time for this report, all the information
+needed to perform a signature check at compile time, is present. A correct
+implementation is indeed just a question of writing a function, that verifies
+the type signature of a declaration correctly.
+\\
+The implementation of the functor functionality itself was not completed either,
+but a tentative implementation has been described in this report.
+As the tentative implementation has been described from a good background knowledge
+of the relevant parts of the Futhark implementation, I see no immediate reason,
+that this implementation should not work \emph barring a total redesign of
+the Futhark implementation, outside of my control.
+\\
 
 \subsection{Method}
 \label{subsec:method}
@@ -55,24 +82,6 @@ weeks' more of developement time.
 At the time of this report, it has not been finished solely due to time constraints.
 \\
 \\
-Both the type aliasing system and the basic structure implementation developed
-during this project, has been designed around a set of interference rules.
-Tests were designed to control whether these rules were obeyed by the actual
-implementation of the type system.
-For both type aliasing and structures, the final iterations of program showed
-that the implementations \textit{did} work as defined in the interference rules.
-
-Although the module signatures were not implemented in time, all the information
-needed to perform a signature check at compile time, is present. A correct
-implementation is indeed just a question of writing a function, that verifies
-the type signature of a declaration correctly.
-\\
-The implementation of the functor functionality itself was not completed either,
-but a hypothetical implementation has been described in this report.
-As the hypothetical implementation has been described from a good background knowledge
-of the relevant parts of the Futhark implementation, I see no immediate reason,
-that this implementation should not work \emph barring a complete redesign of
-the Futhark implementation.
 
 \subsection{Acknowledgements}
 \label{subsec:acknow}
@@ -93,4 +102,3 @@ in developement.
 \\
 \\
 nå, hej hej
-
