@@ -73,6 +73,30 @@ breaks the implementation, or makes the implementation show undefined behaviour.
 After completing the implementation of a feature, I would document the addition
 to the Futhark language in the Futhark language reference documents, and merge
 the git feature branch with master.
+\subsubsection{Alternatives to the chosen method}
+The implementation of Futhark modules was chosen to be done directly in the
+Futhark code base.
+However, we considered another option in the beginning of the project.
+Futhark modules could have been implemented as a prototype instead, using an
+intermediate compiler for the modules specifically.
+\\
+\\
+Instead of writing modules directly in a Futhark source file, the user would
+write futhark modules in an intermediate language.
+This would then be compiled into a normal Futhark source file, without any structures, modules or type aliases.
+\\
+The benefits of this method would have been a larger degree of freedom in the
+implementation: I would have been able to define my an intermediate language for Futhark
+modules, and I could have implemented the intermediate language in a language of
+my own choice, other than Haskell.
+\\
+\\
+I decided against this, because seperating the module compiler from the Futhark
+compiler would demand continued maintenance on the module compiler, whenever the
+Futhark language definition changed.\\
+Furthermore, I decided to develop the modules in Futhark itself, so I could
+benefit from Troels Henriksens knowledge of the Futhark code base, and get more
+comfortable with advanced functional programming concepts, such as monads.
 
 \subsection{Conclusion}
 Implementing a simple Standard ML style module system is not only theoretically
