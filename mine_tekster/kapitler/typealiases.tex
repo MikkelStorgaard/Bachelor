@@ -2,7 +2,7 @@
 To make an implementation of functors (Section \ref{sec:functors}) in Futhark, it was necessary
 to implement type aliases first. Otherwise, it would not be possible to abstract
 a type away in an alias.
-\subsection{The language}\label{futharks_types}
+\subsection{The language}\label{Futharks_types}
 The initial type system in Futhark supported the following type definitions:
 \begin{align*}
   Type           & = & \texttt{Primitive type} \\
@@ -301,14 +301,14 @@ At any point after the type check, only the \texttt{expandedType} of TypeDecl is
 
 \subsection{Results}
 The addition of type aliases works without any issues.
-To verify this, Futhark has been tested to pass all of the tests in futharks
-test suite\footnote{located in folder \texttt{futhark/data/tests}}.
+To verify this, Futhark has been tested to pass all of the tests in Futharks
+test suite\footnote{located in folder \texttt{Futhark/data/tests}}.
 
 However, it was also necessary to write tests to specifically confirm, that the
 implementation respects the rules defined in Subsection ~\ref{typealiasimplementation}.
 The original pull request for working type aliases can be found here:~\cite{typealias_commit}.
 \subsubsection{A type cannot be defined twice in the same environment}
-From \texttt{alias-error3.fut} in \texttt{futhark/src/data/tests/types}:
+From \texttt{alias-error3.fut} in \texttt{Futhark/src/data/tests/types}:
 \begin{verbatim}
 -- You may not define the same alias twice.
 --
@@ -324,7 +324,7 @@ fun int main(int x) = x
 This program fails as expected.
 
 \subsubsection{A type alias cannot be defined, if it refers to a type alias that has not been defined}
-From \texttt{alias-error4.fut} in \texttt{futhark/src/data/tests/types}:
+From \texttt{alias-error4.fut} in \texttt{Futhark/src/data/tests/types}:
 \begin{verbatim}
 -- No undefined types!
 --
@@ -338,7 +338,7 @@ fun foo main(foo x) = x
 This program fails as expected.
 
 \subsubsection{A type alias cannot be cyclically defined}
-From \texttt{alias-error5.fut} in \texttt{futhark/src/data/tests/types}:
+From \texttt{alias-error5.fut} in \texttt{Futhark/src/data/tests/types}:
 \begin{verbatim}
 -- No tricky circular types!
 --

@@ -1,69 +1,57 @@
-\begin{tabular}{p{4em} p{7em} p{11em} p{16em}}
+\begin{tabular}{p{4em} p{7em} p{15em} p{16em}}
   \parbox[t]{4em}{Language part} & \parbox[t]{4em}{language \\construct} & definition & example \\
   Core:         &&& \\
+                & decs ::= & dec decs & \\
+                & $|$ & dec & \\
+                \\
+               
                 & dec ::= 
                   & \texttt{type} \textit{t} \texttt{=} \textit{type\_def}
                     & \texttt{(* type Status = int *)}  \\
                 & $|$
                   & \texttt{fun} \textit{f} \textit{args} \texttt{=} \textit{exp}
                     & \texttt{(* fun foo n = n + 5 *)} \\
-                & $|$ 
-                  & \texttt{val} \textit{x} \texttt{=} \textit{exp}
-                    & \texttt{(* val eleven = 11 *)} \\
+                & $|$
+                  & topdec & \\
                 \\
 Module:         &&& \\
                 & topdec ::=
                   & \textit{sigdec} & \\
                 & $|$
-                  & \textit{moddec} & \\
+                  & \textit{strdec} & \\
+                & $|$
+                  & \textit{functor\_dec} & \\
                 &$|$
                   & \textit{topdec} \textit{topdec} & \\
                 \\
                 & sigdec ::=
-                  & \texttt{signature} \textit{X} \texttt{=} \textit{sigexp}
-                    & \texttt{(* signature foo = ... *)} \\\\
+                  & \texttt{sig} \textit{X} \texttt{\{} \textit{sigexp} \texttt{\}}
+                    & \texttt{(* sig foo \{ ... \} *)} \\\\
                 & sigexp ::=
-                  & \texttt{sig} \textit{sigspec} \texttt{end}
-                    & \texttt{(* sig val bar : int end *)} \\
+                  & \textit{sigspec sigexp} & \\
                 & $|$
-                  & \textit{X}
-                    & \texttt{(*\{foo, bar, One, ... \}*)} \\
+                  & \textit{sigspec}
+                    & \\
                 \\
                 & sigspec
-                  & \texttt{val} x \texttt{:} type
-                    & \texttt{(* val bar : string *)} \\
+                  & \texttt{fun} x \texttt{:} type\_def
+                    & \texttt{(* fun bar : (int , int) -> int *)}  \\
                 & $|$
-                  & \texttt{module} \textit{X} \texttt{:} \textit{sigexp}
-                    & \texttt{(* module Bar : Numberable *)} \\
+                  & \texttt{struct} \textit{X} \texttt{:} sig
+                    & \texttt{(* struct Bar : Numberable *)} \\
                 & $|$
-                  & sigspec sigspec & \\
+                  & \texttt{type} t  & \\
                 \\
-                & moddec ::=
-                  & \textit{dec}
-                    & \\
-                & $|$
-                  & \texttt{module} \textit{X} \texttt{=} \textit{modexp}
-                    & \texttt{(* module One = ... *)} \\
-                &$|$
-                  & moddec moddec
-                    & \texttt{(* val x = 1 val y = 2 *)} \\
+                & strdec ::=
+                  & \texttt{struct} \textit{X} \texttt{\{} \textit{decs}  \texttt{\}}
+                    & \texttt{(* struct One \{ ... \} *)} \\
                 \\
-                & modexp ::=
-                  & \texttt{struct} \textit{moddec} \texttt{end}
-                    & \parbox[t]{15em}{\texttt{(* struct} \\
-                                \texttt{module Adder = PlusOp} \\
-                                \texttt{val one = 1} \\
-                              \texttt{end *)}}
-                              \\\\
                 & $|$
-                  & \textit{modexp} \texttt{:} \textit{sigexp}
-                    & \parbox[t]{10em}{\texttt{(* struct} \\
-                                \texttt{val bar = 1} \\
-                              \texttt{end : foo *)}} \\\\
-                & $|$
-                  & \textit{X}
-                    & \texttt{(* \{One, Numberable, Counter, Queue, ... \} *)}  \\
-                \\                    
+                  & \texttt{struct}\textit{X}\texttt{=} \textit{Foo(structure)}
+                    & \texttt{(* Functor Foo applied on structure *)}  \\
+                \\
+                & functor\_dec ::=
+                  & \texttt{functor} X(\textit{arg} : \textit{signature})\texttt{\{} funct\_decls \texttt{\}} & \\
 Module access:  &&& \\
                 & LongIdent ::=
                   & \textit{module}\texttt{.}\textit{field}

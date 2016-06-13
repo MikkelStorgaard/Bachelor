@@ -56,8 +56,8 @@
 \contentsline {subsubsection}{\numberline {6.1.1}Alternatives to the chosen method}{47}{subsubsection.6.1.1}
 \contentsline {subsection}{\numberline {6.2}Conclusion}{47}{subsection.6.2}
 \contentsline {subsection}{\numberline {6.3}Acknowledgements}{48}{subsection.6.3}
-\contentsline {section}{\numberline {7}Appendices}{50}{section.7}
-\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{50}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{51}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{54}{subsection.7.3}
-\contentsline {section}{\numberline {8}References}{57}{section.8}
+\contentsline {section}{\numberline {7}Appendices}{49}{section.7}
+\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{49}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{50}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{53}{subsection.7.3}
+\contentsline {section}{\numberline {8}References}{56}{section.8}

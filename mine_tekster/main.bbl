@@ -31,7 +31,7 @@
 \newblock {\em {The Definition of Standard ML}}.
 \newblock MIT Press, 1997.
 
-\bibitem{futhark_benchmarks}
+\bibitem{Futhark_benchmarks}
 {Various}.
 \newblock {Futhark Benchmarks}.
 \newblock \url{https://github.com/hiperfit/futhark-benchmarks}.

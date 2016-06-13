@@ -2,7 +2,7 @@
 \label{sec:structures}
 \textbf{Introduction to structures:}\\
 \label{subsec:structuresintroduction}
-Without structures, every function and type in futhark shares the same scope.
+Without structures, every function and type in Futhark shares the same scope.
 Implementing structures lets us create function with the same name, but differenct implementations.
 Take this example of a program with two different vector types:
 \begin{verbatim}
@@ -42,7 +42,7 @@ Vec4Float.fut:
     end
 \end{verbatim}
 \clearpage
-We also have a futhark program which includes and utilizes these structures:
+We also have a Futhark program which includes and utilizes these structures:
 \begin{verbatim}
 myprogram.fut:
 
@@ -449,7 +449,7 @@ consider my testing options. I have had the choice of writing either \textit{whi
 tests, \textit{black box }tests, or both.
 \\
 \\
-In the context of these futhark structures, white box tests are defined as tests
+In the context of these Futhark structures, white box tests are defined as tests
 that are designed by a programmer, who has intricate knowledge of the
 code implementation of the program features, he is supposed to test.\\
 I.e., this means trying to write programs, which tests whether there can be
@@ -558,13 +558,13 @@ to support an \texttt{as} statement, so that the inclusion
 
 \texttt{include some\_module as M0}
 
-will include the declarations from \texttt{some\_module} into the futhark program, but not
+will include the declarations from \texttt{some\_module} into the Futhark program, but not
 into the top level declarations. Instead, the declarations will be loaded into a
 structure \texttt{M0}, which can then be accessed throughout the rest of the program as
 any other structure.
 \\
 \\
 Another potential effort worth of mentioning is the commence the definition of a
-standard library for futhark. Futhark already has built-ins mathematical
+standard library for Futhark. Futhark already has built-ins mathematical
 functions like log10(float a), so defining a standard library of structures
 which define i.e. Integer-functions and Float-functions, could be the next step.

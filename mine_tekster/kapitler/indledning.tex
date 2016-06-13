@@ -5,8 +5,8 @@ This report describes the efforts in defining a concrete method of extending the
 A module system is here defined as a programming feature, which allows the programmer to package functionality into a discrete code package.
 
 A module can then be shared and utilized in any other program, by including it in the source code. Widely known modules include \texttt{NumPy}\footnote{\url{http://www.numpy.org/}}, the Python package for
-data modelling and computing, and \texttt{NLTK}\footnote{\url{http://nltk.org}},
-the Natural Language Toolkit (also for Python.)
+data modelling and computing, \texttt{NLTK}\footnote{\url{http://nltk.org}},
+the Natural Language Toolkit (also for Python), or \texttt{leftpad}\footnote{\url{https://www.npmjs.com/package/left-pad}} for node.js.
 
 
 A well written module can become very popular. In some cases, a programmers choice of programming language for a given project, can be decided by the number and quality of available, project relevant modules.
@@ -20,7 +20,7 @@ Not only does the Standard ML modules enable structures with predefined implemen
 These abstract structures are applied on an argument of a fitting signature, returning a realized structure. This makes it possible to write structures that does not commit to one certain type, but instead inherits the functionality defined in the given argument.
 
 
-This spares the developers for writing a lot of almost identical code. Refer to (Figure 2{first_functor_example}) for a simple example.
+This spares the developers for writing a lot of almost identical code. Refer to (Figure 2\ref{first_functor_example}) for a simple example.
 
 
 \textbf{Reader expectations}:
@@ -28,7 +28,7 @@ The reader is expected to have experience with statically typed languages, funct
 \pagebreak
 \subsection{Motivation}
 \label{subsec:label}
-The Futhark language a young language\footnote{It's official web site \url{http://futhark-lang.org} was launched in March 2016.}, and is in continous developement. Extending this language to support modules would increase the usability of Futhark, which could be a factor in expanding the user base and user retention
+The Futhark language a young language\footnote{It's official web site \url{http://Futhark-lang.org} was launched in March 2016.}, and is in continous developement. Extending this language to support modules would increase the usability of Futhark, which could be a factor in expanding the user base and user retention
 of Futhark.
 
 
@@ -100,7 +100,7 @@ We will reiterate on the concept of structures (Section \ref{sec:structures}), b
 the concept of functors.\\
 First we repeat the three-dimensional vector structure
 from earlier, but without declaring any particular
-primitive type (Section ~\ref{futharks_types}) as the contained type of the vector (Figure ~\ref{struct_vec3}).
+primitive type (Section ~\ref{Futharks_types}) as the contained type of the vector (Figure ~\ref{struct_vec3}).
 \begin{figure}
   \begin{verbatim}
   functor Vec3 ( number_type : NumType) { 
