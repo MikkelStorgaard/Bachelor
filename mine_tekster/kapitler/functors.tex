@@ -2,7 +2,7 @@
 \section{Functors}
 \label{sec:functors}
 A function takes a number of arguments of specified types, and returns a value of some return type.
-A \textbf{functor} takes a structure\ref{structures} of a specified signature,
+A \textbf{functor} takes a structure\ref{sec:structures} of a specified signature,
 and returns a structure of some signature.
 \\
 \\
@@ -76,7 +76,7 @@ will have to create a functor, that returns a structure of signature
 
 \subsection{The reason for functors}
 \label{subsec:reasonfunctors}
-As explained in the introduction of this report\ref{higherorderfunctionality},
+As explained in the introduction of this report\ref{subsec:higherorderfunctionality},
 functors allows the programmer to write modules with abstract structures,
 defining some functionality.
 %% the reason is that WE CAN HAVE ALMOST POLYMORPHISM
@@ -84,6 +84,7 @@ Functors does not give us actual polymorphism in our programs, but it
 \emph{does} allow us to generalize functionality, when it is not tied to any
 specific type traits.
 
+Riccardo Pucella demonstrates in his "Notes on Programming SML/NJ"\cite[pp. 59-60]{functors}, how to implement a data structure \texttt{Queue}, using a functor that takes a structure of signature \texttt{Stack} as an argument. The queue is a widely used data structure, which makes an abstract implementation an excellent alternative to implementing a queue for each data type we need.
 \subsection{Tentative implementation of functors}
 \label{subsec:implementing_functors}
 Implementing a simple functor which instantiates a structure on application,
@@ -179,7 +180,7 @@ have been expanded to allow functor application, and checkFunctor has been added
 \end{lstlisting}
 % $
 
-As our results from structures\ref{structuresresult} showed, that structures in
+As our results from structures\ref{subsec:structuresresults} showed, that structures in
 Futhark behaved as we would expect, I will claim that this tentative solution
 works as well.
 applyFunctor doesn't do much else than resolving the abstract declarations of

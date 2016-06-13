@@ -1,9 +1,46 @@
 \begin{thebibliography}{1}
 
 \bibitem{crash_course}
-Danny Gratzer.
-\newblock A crash course on ml modules.
-\newblock http://jozefg.bitbucket.org/posts/2014-00-08-modules.html.
-\newblock 12.06.2016.
+{Danny Gratzer}.
+\newblock {A Crash Course on ML Modules}.
+\newblock \url{http://jozefg.bitbucket.org/posts/2014-00-08-modules.html}.
+\newblock Online; accessed 12.06.2016.
+
+\bibitem{structure_commit}
+{Mikkel Storgaard Knudsen}.
+\newblock {Git commit containing complete structure feature}.
+\newblock
+  \url{https://github.com/HIPERFIT/futhark/commit/7e39b9c759587e3f8a1d5c3b0de68b1400baa4c1}.
+\newblock Online; accessed 12.06.2016.
+
+\bibitem{typealias_commit}
+{Mikkel Storgaard Knudsen}.
+\newblock {Original git commit containing complete type aliasing feature}.
+\newblock
+  \url{https://github.com/HIPERFIT/futhark/commit/8c0034d6764a71482b50db7694c9bbc2ac4cf7b2}.
+\newblock Online; accessed 12.06.2016.
+
+\bibitem{functors}
+{Riccardo Pucella}.
+\newblock {Notes on Programming SML/NJ}.
+\newblock \url{http://www.cs.cornell.edu/riccardo/smlnj.html}.
+\newblock Online; accessed 12.06.2016.
+
+\bibitem{sml_book}
+{Robin Milner and Mads Tofte and Robert Harper and David McQueen}.
+\newblock {\em {The Definition of Standard ML}}.
+\newblock MIT Press, 1997.
+
+\bibitem{futhark_benchmarks}
+{Various}.
+\newblock {Futhark Benchmarks}.
+\newblock \url{https://github.com/hiperfit/futhark-benchmarks}.
+\newblock Online; accessed 12.06.2016.
+
+\bibitem{scala_modules}
+{Yawar Amin}.
+\newblock {Scala Modules}.
+\newblock \url{https://github.com/yawaramin/scala-modules}.
+\newblock Online; accessed 12.06.2016.
 
 \end{thebibliography}

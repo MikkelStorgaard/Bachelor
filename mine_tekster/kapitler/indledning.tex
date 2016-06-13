@@ -1,60 +1,38 @@
 \section{Introduction}
 \label{sec:introduction}
 This report describes the efforts in defining a concrete method of extending the Futhark Programming Language with a module system.
-A module system is here defined as a programming feature,
-which allows the programmer to package functionality into a discrete code
-package.
-\\\\
-After a module has been defined, it can then be shared and utilized in any other
-program, by including it in these programs. Widely known modules include
-\texttt{NumPy}\footnote{\url{http://www.numpy.org/}}, the Python package for
+
+A module system is here defined as a programming feature, which allows the programmer to package functionality into a discrete code package.
+
+A module can then be shared and utilized in any other program, by including it in the source code. Widely known modules include \texttt{NumPy}\footnote{\url{http://www.numpy.org/}}, the Python package for
 data modelling and computing, and \texttt{NLTK}\footnote{\url{http://nltk.org}},
 the Natural Language Toolkit (also for Python.)
-\\
-These suites can be downloaded and used in any Python project.
-\\
-\\
-A well written module can become very popular. In some cases, a programmers
-choice of programming language for a given project, can be decided by the number and quality of
-available, project relevant modules.
-\\
-\\
-The module system design for Futhark has been inspired by the module system
-implemented in Standard ML\cite{crash_course}. Not only does the Standard ML
-modules enable structures with predefined implementations.
-It also defines a system of \textit{functors\footnote{Not to be confused with neither mathematical
-  functors or functors from Haskell}}, which defines abstract implementations of
-structures.
-\\
-\\
-These abstract implementations of structures can be then be instantiated by
-applying the functor on an argument of a fitting signature.
-This makes it
-possible to write structures that does not commit to one certain type, but
-instead inherits the functionality defined in the given argument.
-\\
-\\
-This spares the developers for writing a lot of almost identical code. Refer to
-\ref{first_functor_example} for a simple example.
-\\
-\\
-\textbf{Reader expectations}:\\
-The reader is expected to have experience with statically typed languages,
-functional programming, and preferable the Haskell programming language.
+
+
+A well written module can become very popular. In some cases, a programmers choice of programming language for a given project, can be decided by the number and quality of available, project relevant modules.
+
+
+The module system design for Futhark has been inspired by the module system implemented in Standard ML\cite{crash_course}. 
+
+Not only does the Standard ML modules enable structures with predefined implementations. It also defines a system of \textit{functors\footnote{Not to be confused with neither mathematical functors or functors from Haskell}}, which defines abstract implementations of structures.
+
+
+These abstract structures are applied on an argument of a fitting signature, returning a realized structure. This makes it possible to write structures that does not commit to one certain type, but instead inherits the functionality defined in the given argument.
+
+
+This spares the developers for writing a lot of almost identical code. Refer to (Figure \ref{first_functor_example}) for a simple example.
+
+
+\textbf{Reader expectations}:
+The reader is expected to have experience with statically typed languages, functional programming, and preferable the Haskell programming language.
 \pagebreak
 \subsection{Motivation}
 \label{subsec:label}
-The Futhark language a very young language, and is therefore still very much in
-developement.
-Extending this language to support modules would increase the usability of
-Futhark, which could be a factor in expanding the user base and user retention
+The Futhark language a young language\footnote{It's official web site \url{http://futhark-lang.org} was launched in March 2016.}, and is in continous developement. Extending this language to support modules would increase the usability of Futhark, which could be a factor in expanding the user base and user retention
 of Futhark.
-\\
-\\
-The implementation of a module system, will greatly expand the usability of
-Futhark, without having side effects on the performance of the compiled Futhark code.
-The following subsections contain the features this project is implementing, and
-examples of why these features are desirable.
+
+
+The following subsections contain the features this project is implementing, and examples of why these features are desirable.
 \subsubsection{Abstraction increases readability.} 
 \begin{figure}
 \begin{mdframed}
@@ -72,18 +50,15 @@ fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 \end{figure}
 Type aliasing lets us abstract from the actual definition of data types.
 When writing our source code, we can define our type aliases before writing the
-rest of our program.
-%% skriv bedre
-If we want to define a sphere in a three dimensional space, we want to define it
-with \\
-\textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
-moving.\\
+rest of our program. Take for example a sphere in three dimensional space:
+It has \textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
+moving in.\\
 Let us define a function that multiplies the speed of the sphere by a factor k: (Figure ~\ref{noalias})
 \clearpage
-\noindent
+
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
-Coupled with helper functions, we can now multiply the speed of the sphere\ref{sphere_example}.
+Coupled with helper functions, we can now multiply the speed of the sphere\ref{sphere_example} without being explicit about the actual types at each function call.
 \begin{figure}
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
@@ -108,12 +83,12 @@ match on the type aliased values contained in the sphere type.
 Most importantly, the vectors of the sphere are abstracized into a single variables
 instead of tuples.
 \\
-The end result is a shorter, more readable program.\ref{nbody_after}
+The end result is a shorter, more readable program.
 
 \subsubsection{Compartmentalization of functionality increases usability:}
 Splitting code functionality into multiple files, will allow the programmer to
 compile and type check these modules individually. The programmer can edit and
-contribute to these files independantly of the programs which includes these
+contribute to these files independently of the programs, which includes these
 modules.
 
 \subsubsection{Approximating higher order functionality whilst keeping performance}
@@ -125,7 +100,7 @@ We will reiterate on the concept of structures\ref{sec:structures}, by introduci
 the concept of functors.\\
 First we repeat the three-dimensional vector structure
 from earlier, but without declaring any particular
-primitive \ref{futharks_types} type as the contained type of the vector\ref{struct_vec3}.
+primitive type (Section ~\ref{futharks_types}) as the contained type of the vector (Figure ~\ref{struct_vec3}).
 \begin{figure}
   \begin{verbatim}
   functor Vec3 ( number_type : NumType) { 
@@ -139,16 +114,15 @@ primitive \ref{futharks_types} type as the contained type of the vector\ref{stru
   \end{verbatim}
   \caption{A functor defining a vector structure \label{struct_vec3}}
 \end{figure}
-\noindent
+
 The structure\ref{struct_vec3} above cannot be used on its own. Type \texttt{t} is not
 instantiated, and the module cannot be type checked, which causes an error.
 
-\noindent
+
 We can solve that problem, by applying the abstract structure on a concrete
 structure.
 
 \begin{figure}
-
 \begin{verbatim}
   struct Int {
     type t = int 
@@ -156,26 +130,20 @@ structure.
   struct IntVec3 = Vec3(Int)
 \end{verbatim}
 \caption{The IntVec3 structure is an instance of Vec3. \label{first_functor_example}}
-
 \end{figure}
-\noindent
 We can now access the structure \texttt{IntVec3} throughout the rest of the
 program.
-\\
-The structure \texttt{IntVec3} is \texttt{Vec3}, except all instances
-of type \texttt{t} in \texttt{Vec3} is exchanged with type \texttt{int}.
-\\
-\\
-\textbf{To recap:} functors allows us to define an abstract implementation of some
-structure \textbf{ONCE}, and lets us instantiate this structure any number of
-times, each time with our own type.
-\\
-\\
+
+The structure \texttt{IntVec3} is \texttt{Vec3}, except all instances of type \texttt{t} in \texttt{Vec3} is exchanged with type \texttt{int}.
+
+
+\textbf{To recap:} functors allows us to define an abstract implementation of some structure \textbf{ONCE}, and lets us instantiate this structure any number of times, each time with our own type.
+
+
 From a performance-concerned point of view, the module system is desirable, as the Futhark compiler handles all used and included structures at compile time.
 \subsection{Problem definition}
 \label{subsec:probdef}
-Is it possible to implement a module system in Futhark, which displays features
-comparable to the module system implemented in Standard ML? \cite{crash_course}.
+Is it possible to implement a module system in Futhark, which displays features comparable to the module system implemented in Standard ML?
 
 \subsubsection{Scope of project}
 \label{subsec:project_scope}
@@ -189,15 +157,13 @@ The scope of the project is
       \item A well defined way of referring to types, structures and functions
         contained in a structure
     \end{itemize}
-  \item to research the possibility of implementing functor functionality, so that Futhark supports the
-    definition of abstract structures and concretizations of these structures.
-    \\    A suggested design for the implementation of functors should be part of this project.
+  \item to research the possibility of implementing functor and signature functionality, so that Futhark supports the definition of abstract structures and concretizations of these structures. A suggested design for the implementation of functors should be part of this project.
 \end{itemize}
 \clearpage
 
 \subsection{Related work}
 Futhark modules are designed with Standard MLs module system in mind. Thus, 
-\textit{The Definition of Standard ML '97} \citep{sml_book} has been a source of inspiration
+\textit{The Definition of Standard ML '97}\cite{sml_book} has been a source of inspiration
 for the behaviour of the Futhark module system. \\
 However, I have not read the code implementation of SML modules. My code supervisor and I did not find it necessary to lean on the SML implementation of modules:\\
 The Futhark compiler could readily support extensions to the language, and it was not difficult to
@@ -205,7 +171,7 @@ figure out a way to implement the module system.
 \\
 \\
 Implementing SML modules in other languages is not a unique idea:\\
-Amin\ref{scala_modules}Yaraw has shown a way of implementing SML modules in Scala
+Yaraw Amin\cite{scala_modules} has shown a way of implementing SML modules in Scala
 language. However, he was able to exploit functionality that was already available in
 Scala, to create his module system.
 \\
@@ -216,4 +182,4 @@ Mainly, he was able to use Scala \texttt{functions} as functors to create new Sc
 \\
 \\
 Futhark had neither functions (for structures), structures or signatures at the
-beginning of the project, which made these necessary to add to the compiler itself.
+beginning of the project, which made these necessary to add to the compiler itself. Therefore, the following project is not necessarily original research (as modules are a well known concept,) but an original implementation in Futhark. Original as opposed to i.e. a port of the implementation from SML/NJ.

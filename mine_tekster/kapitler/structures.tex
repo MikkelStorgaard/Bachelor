@@ -1,12 +1,11 @@
 \section{Structures}
 \label{sec:structures}
 \textbf{Introduction to structures:}\\
-\label{subsec:structuresaregood}
+\label{subsec:structuresintroduction}
 Without structures, every function and type in futhark shares the same scope.
-Implementing modules lets us create functions that are alike, but keeps
+Implementing structures lets us create functions that are alike, but keeps
 distinctions between them.
 Take this example of a program with two different vector types:
-
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
 type vec4 = {f32, f32, f32, f32}
@@ -23,9 +22,9 @@ fun vec4 vec4_plus(
 \end{verbatim}
 \noindent
 Let us try compartmentalizing a vector type and its functions into a structure.\\
-  In the following example, we have defined two different modules, each
+  In the following example, we have defined two different structures, each
 containing a structure,
-and a futhark program which includes and utilizes these modules:
+and a futhark program which includes and utilizes these structures:
 \begin{verbatim}
 Vec3Float.fut:
   structure Vec3Float = 
@@ -60,7 +59,7 @@ myprogram.fut:
     in Vec4.multiply({a, b, c, 1.0f} , 4.0f)
 \end{verbatim}
 \noindent
-Whilst it \textit{is} possible to create libraries without a module
+Whilst it \textit{is} possible to create libraries without a structure
 implementation \footnote{By including libraries that adds functions to the top
   level environment}, the user runs a risk of running into errors like
 \texttt{MulipleDefinitionError}\footnote{Multiple functions of same name
@@ -86,7 +85,7 @@ the accessing types and functions in structures.
 
 \end{tcolorbox}
 \subsubsection{Accessing types and functions within structures}
-To work with type aliases and modules, we need to define the internal
+To work with type aliases and structures, we need to define the internal
 environment of Futhark during compile time.\\
 \\
 Before starting this project, the environment of Futhark could be described like
@@ -108,7 +107,7 @@ Any $\Gamma_{strid}$ contains its own function-, typealias-, signature-, structu
 Now that we can discern between the global environment, and any number of
 environments in structures, we must redefine the environment behaviour of Futhark at compile time.
 \\
-\begin{figure}\label{Rule1}
+\begin{figure}
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{$\Gamma \vdash fundecl \Rightarrow \Gamma'$}
@@ -126,12 +125,12 @@ environments in structures, we must redefine the environment behaviour of Futhar
     iff the function the function body is otherwise well-formed\footnote{I will not go further into
       the functionality of functions, as it is not within scope of this project.}.
   \end{tcolorbox}
-  \caption{Rule for adding a function to the environment}
+  \caption{Rule for adding a function to the environment \label{RuleAddFunDecl}}
 \end{figure}
 
 After expanding the environment to contain the four new elements, we can define the
 addition of any of these four elements follow a generalized rule:
-\begin{figure}\label{Rule2generalized}
+\begin{figure}
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash Decl_1 \Rightarrow \Gamma' $ }
@@ -139,6 +138,7 @@ addition of any of these four elements follow a generalized rule:
         \BinaryInfC{ $\Gamma \vdash$ \texttt{decltype} \textit{id }\texttt{=} \textit{decl} $\Rightarrow \{ id \to Decl \} $ }
       \end{prooftree}
     \end{tcolorbox}
+    \caption{A generalized rule for adding declarations to the environment \label{RuleAddDecl}}
 \end{figure}
 Please note, that several declarations can actually share name \textit{id}, as
 long as they don't share declaration type.\\
@@ -146,7 +146,7 @@ long as they don't share declaration type.\\
 \subsubsection{Interference rules for adding multiple declarations}
 Finally, we want to create a rule for which environment we get, when we state
 multiple declarations in a row.
-\begin{figure}\label{Rule2multiple}
+\begin{figure}
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash Decl_1 \Rightarrow \Gamma_1 $ }
@@ -155,9 +155,10 @@ multiple declarations in a row.
       \end{prooftree}
       For any $\Gamma$, $\Gamma_a \oplus \Gamma_b \Rightarrow \Gamma_a \cup \Gamma_b$
     \end{tcolorbox}
+  \caption{The behaviour of multiple declarations in a row. \label{RuleAddMultiple}}
 \end{figure}
 This rule is covers the run of an entire program, since we can set the initial
-declaration in the program as $Decl_1$, use rule \ref{Rule2multiple} to handle
+declaration in the program as $Decl_1$, use rule \ref{RuleAddMultiple} to handle
 the first declaration in the pair $Decl_1$ and $Decl_2$, and afterwards using
 the same rule again on $Decl_2$, $Decl_3$.
 \\
@@ -166,21 +167,20 @@ $Decl_{n-1}$, $Decl_n$.
 We must take a closer look at what happens, when a structure is defined.
 The definition of a structure in Futhark has the following behaviour.
 \subsubsection{Rule for adding a structure to the local environment}
-\begin{figure}[h!]\label{Rule3}
+\begin{figure}
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash strdecl \Rightarrow \Gamma'$ }
       \AxiomC{ $\Gamma \vdash strdecls \Rightarrow \Gamma_{strdecls}$}
-      \AxiomC{ $\Gamma \oplus \Gamma_{strdecls} \vdash \Gamma_{strid}$}
+      \AxiomC{ $\Gamma \cup \Gamma_{strdecls} \vdash \Gamma_{strid}$}
         \TrinaryInfC{$\Gamma \vdash$ \texttt{struct} \textit{strid}
           \texttt{\{} \textit{strdecls} \texttt{\}}
           $\Rightarrow \{ strid \to \Gamma_{strid}\}$}
     \end{prooftree}
-    where $\Gamma \oplus \Gamma_{strdecls} \Rightarrow \Gamma \cup
-    \Gamma_{strdecls}.$
     If there is a shared identifier in both $\Gamma$ and $\Gamma_{strdecls}$,
     the definition in $\Gamma_{strdecls}$ is the definition in $\Gamma_{strid}$.
   \end{tcolorbox}
+  \caption{The behavior of constructing a structure.\label{RuleAddStruct}}
 \end{figure}
 The consequence of defining $\Gamma_{strid}$ as a union of new declarations together with the old environment menas, that Futhark exhibits variable shadowing, where definitions in a structure are valid in its nested structures, unless they are redefined in the nested structure.
 
@@ -201,19 +201,24 @@ longname:\\
 \begin{verbatim}
   type int_pair = Pairs.Int.t 
 \end{verbatim}
+
+\begin{figure}
+\begin{tcolorbox}
 We can define the interference rule for using a longname in the three different
 cases. As all three cases handles resolving a longname the same way, the rule
 will only be called for the first case:
-\begin{figure}\label{Rule5}
   \begin{prooftree}
     \AxiomC{$\Gamma \vdash \mathit{longname} \to fun\_definition$}
     \UnaryInfC{$\Gamma \vdash let x = longname() \Rightarrow x := \downarrow longname$}
   \end{prooftree}
   where
   \begin{align*}
-    \downarrow longname & = & return getFromEnv(longname , \Gamma) \\
+    \downarrow longname\ =\ return\ getFromEnv(longname ,\ \Gamma) \\
   \end{align*}.
+\end{tcolorbox}
+  \caption{Resolving a longname in the environment \label{RuleResolveLongname}}
 \end{figure}
+
 \subsection{Implementation}
 A program in the Futhark type checker is defined as a list of unchecked
 declarations.
@@ -254,7 +259,7 @@ checkProg' checks the initial top level of declaratations for duplicates.
 %$
 \subsubsection{Checking for duplicates}
 \label{subsec:checkingforduplicates}
-As described in rule \ref{Rule4}, we allow multiple declarations of same name,
+As described in rule \ref{RuleAddDecl}, we allow multiple declarations of same name,
 as long as they don't share type:
 In example, checking for two function definitions of the same type is done in
 the first case of checkForDuplicateDecs:
@@ -281,7 +286,7 @@ of the structure.
 Therefore we divide any list of declaration into type- and function
 declarations, and structure declarations.
 An example is given in figure\ref{chunks}
-\begin{figure}\label{chunks}
+\begin{figure}
   \begin{tcolorbox}
     \begin{lstlisting}[language=Haskell]
       fun int four() = 4
@@ -299,6 +304,7 @@ An example is given in figure\ref{chunks}
     \texttt{main()} does, because \texttt{M0} HAS already been parsed, at the point where
     \texttt{main()} is declared
   \end{tcolorbox}
+  \caption{An example of scope behaviour \label{chunks}}
 \end{figure}
 \\
 This chunking is done recursively on a list of declarations:
@@ -310,8 +316,7 @@ chompDecs decs = f ([], decs)
         f (foo , bar) = (foo, bar)
 \end{lstlisting}
 \clearpage
-\subsubsection{Checking function- and type declarations}
-\label{subsec:checkfunortype}
+\subsubsection{Checking function- and type declarations \label{subsec:checkfunortype}}
 \begin{lstlisting}[language=Haskell, numbers=left]
 checkDecs :: [DecBase NoInfo VName] -> TypeM (Scope, [DecBase Info VName])
 checkDecs decs = do
@@ -330,14 +335,14 @@ checkDecs [] = do
 % $
 1) The current chunk of declarations is built using chompDecs. \\
 2) A scope is built from this chunk, by using the three interference rules in
-section \ref{normaldecls}.\\
+section \ref{structuresinterferencerules}.\\
 3) The scope from step 2 is now the local scope in the following function
 execution.\\
 4) checkFunOrTypeDec does the actual typechecking of the function declaration. \\
 5) The remainder of the declarations chunked in chompDecs is checked using
 checkDecs. Note, that the first element of \texttt{rest} must be a structure
 declaration, due to the implementation of chompDecs.\\
-\subsubsection{Checking structure declarations}\label{checkingstructuredeclarations}
+\subsubsection{Checking structure declarations\label{checkingstructuredeclarations}}
 Please note that structures are currently called modules inside Futharks compiler.
 \begin{lstlisting}[language=Haskell]
 checkDecs (ModDec modd:rest) = do
@@ -352,7 +357,7 @@ When checkDecs encounters a \texttt{ModDec}, \texttt{checkMod} is called to reso
 The ModDec defines an environment of functions and type declarations called
 modscope, which we add to the local environment by calling \texttt{local
   (addModule modscope)}\\
-This part of the code is the implementation of rule\ref{Rule3}.
+This part of the code is the implementation of rule\ref{RuleAddStruct}.
 \begin{lstlisting}[language=Haskell]
 checkMod :: ModDefBase NoInfo VName -> TypeM (Scope , ModDefBase Info VName)
 checkMod (ModDef name decs loc) =
@@ -363,9 +368,8 @@ checkMod (ModDef name decs loc) =
 \end{lstlisting}
 %$
 checkMod first adds a ``breadcrumb'' of the structure's name (\textit{strid}) to
-the local environment. This is where the transformation in rule \ref{Rule3} of
-$\Gamma_{strdecls} \Rightarrow \Gamma_{strid}$ is implemented.
-\\
+the local environment. 
+
 After the environment has been given its name, the internal declaration of the
 structure is read using \texttt{checkDecs}.
 \\
@@ -373,9 +377,9 @@ structure is read using \texttt{checkDecs}.
 Resolving the application for a longname is done through two short recursive
 functions.
 \\
-Figure \ref{resolvelongname} shows the implementation of the longname rule
-\ref{Rule5}:
-\begin{figure}\label{resolvelongname}
+Figure \ref{ResolveLongname} shows the implementation of the longname rule
+\ref{RuleResolveLongname}:
+\begin{figure}
   \begin{lstlisting}[language=Haskell]
     type LongName = ([Name], name)
 
@@ -399,10 +403,11 @@ Figure \ref{resolvelongname} shows the implementation of the longname rule
           Nothing -> Nothing
     envFromScope [] scope = Just scope
 \end{lstlisting}
+\caption{The Haskell code which resolves a longname \label{ResolveLongname}}
 \end{figure}
 %$
 
-\subsubsection{Including structures, functions and types from other files}\label{structuresincludes}
+\subsubsection{Including structures, functions and types from other files\label{structuresincludes}}
 The Futhark \texttt{include}-statement lets the user include
 other files into the current program.
 \\
@@ -419,7 +424,7 @@ However, this creates a hazard: there might be declarations in the included
 code, which has names that overlap with names in the remaining code, so that a
 \texttt{DuplicateDefinitionError} is triggered. the included code has any declarations
 that results in a duplicate definition error. Refer to
-\ref{structuresfuturework} for a possible future solution.
+\ref{subsec:StructuresFutureWork} for a possible future solution.
 
 \subsubsection{Keeping track of function names}
 Futharks variable shadowing made it necessary to extend the type of the function
@@ -434,8 +439,7 @@ is added to the function table together with it's longname. The function's
 longname contains the function's name, and the name of the (potentially) nested
 structures it was defined in.
 
-\subsection{Tests}
-\label{subsec:structuretests}
+\subsection{Tests\label{subsec:structuretests}}
 To verify that the implementation of structures was correct, a series of test
 programs were written to verify, whether the interference rules defined for the
 structures, actually held in an executed Futhark program.
@@ -460,7 +464,7 @@ in the actual implementation.
 In the following tests, programs which break the rules are expected to return
 with an error.
 \subsubsection{Testing rule for multiple declarations [...]}
-The following tests are implemented to test whether rule \ref{Rule4} holds.
+The following tests are implemented to test whether rule \ref{RuleAddDecl} hold; that we can have several declarations of the same name, as long as they don't share declaration type.\\
 \texttt{duplicate\_def0.fut}:
 \lstinputlisting[language=Haskell]{./tests/duplicate_def0.fut}
 This test passes.
@@ -488,7 +492,7 @@ This test passes.
 
 \subsubsection{Testing structures can be called as expected}
 The following tests are implemented to test that calling structures works as
-defined in rule \ref{Rule5}.
+defined in rule \ref{RuleResolveLongname}.
 \\
 \texttt{calling\_nested\_module.fut}:
 \lstinputlisting[language=Haskell]{./tests/calling_nested_module.fut}
@@ -509,7 +513,7 @@ This test passes.
 \clearpage
 
 \subsubsection{Testing rule for variable shadowing}
-The following tests are implemented to test whether the rule \ref{Rule4a} holds:
+The following tests are implemented to test whether the rule \ref{RuleAddStruct} holds:
 Simple shadowing for functions holds:
 \\
 \texttt{shadowing0.fut}:
@@ -542,9 +546,11 @@ internaliser.
 
 Besides two small fixes in Internalise.hs, it has not been necessary to change
 any part of the Futhark compiler pipeline, after the TypeChecker step.
+
+The original pull request for working type aliases can be found here:~\cite{structure_commit}.
 \subsection{Future work}
-\label{subsec:structuresfuturework}
-As mentioned in \ref{structureincludes}, it is possible to trigger a
+\label{subsec:StructuresFutureWork}
+As mentioned in \ref{structuresincludes}, it is possible to trigger a
 \texttt{DuplicateDefinitionError} from including files into the main program.
 
 Given more time, I would like to extend the Futhark \texttt{include} statement
@@ -555,7 +561,7 @@ to support an \texttt{as} statement, so that the inclusion
 will include the declarations from \texttt{some\_module} into the futhark program, but not
 into the top level declarations. Instead, the declarations will be loaded into a
 structure \texttt{M0}, which can then be accessed throughout the rest of the program as
-any other module.
+any other structure.
 \\
 \\
 Another potential effort worth of mentioning is the commence the definition of a

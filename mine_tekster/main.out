@@ -33,7 +33,7 @@
 \BOOKMARK [3][-]{subsubsection.3.2.2}{checkProg}{subsection.3.2}% 33
 \BOOKMARK [3][-]{subsubsection.3.2.3}{Checking for duplicates}{subsection.3.2}% 34
 \BOOKMARK [3][-]{subsubsection.3.2.4}{Dividing a Futhark program into chunks}{subsection.3.2}% 35
-\BOOKMARK [3][-]{subsubsection.3.2.5}{Checking function- and type declarations}{subsection.3.2}% 36
+\BOOKMARK [3][-]{subsubsection.3.2.5}{Checking function- and type declarations }{subsection.3.2}% 36
 \BOOKMARK [3][-]{subsubsection.3.2.6}{Checking structure declarations}{subsection.3.2}% 37
 \BOOKMARK [3][-]{subsubsection.3.2.7}{Resolving the application of a longname}{subsection.3.2}% 38
 \BOOKMARK [3][-]{subsubsection.3.2.8}{Including structures, functions and types from other files}{subsection.3.2}% 39
@@ -60,3 +60,4 @@
 \BOOKMARK [2][-]{subsection.7.1}{Futhark Module Language}{section.7}% 60
 \BOOKMARK [2][-]{subsection.7.2}{nbody before type aliasing}{section.7}% 61
 \BOOKMARK [2][-]{subsection.7.3}{nbody using type aliasing}{section.7}% 62
+\BOOKMARK [1][-]{section.8}{References}{}% 63

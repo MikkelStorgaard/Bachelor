@@ -62,7 +62,7 @@ we can define the following interference rules for using type aliases:
 where
 \begin{align*}
              & \{ \emptyset , \{ type\_id \to Type \} \} \oplus \Gamma  \\
- \Rightarrow & Types(\Gamma) \leftarrow \ Types(\Gamma) \cup \{type\_id \to Type\}
+ \Rightarrow & Types(\Gamma) :=\ Types(\Gamma) \cup \{type\_id \to Type\}
 \end{align*}
 \\
 iff the type alias declaration does not
@@ -304,8 +304,8 @@ To verify this, Futhark has been tested to pass all of the tests in futharks
 test suite\footnote{located in folder \texttt{futhark/data/tests}}.
 
 However, it was also necessary to write tests to specifically confirm, that the
-implementation respects the rules defined in \ref{typealiasimplementation}
-
+implementation respects the rules defined in \ref{typealiasimplementation}.
+The original pull request for working type aliases can be found here:~\cite{typealias_commit}.
 \subsubsection{A type cannot be defined twice in the same environment}
 From \texttt{alias-error3.fut} in \texttt{futhark/src/data/tests/types}:
 \begin{verbatim}

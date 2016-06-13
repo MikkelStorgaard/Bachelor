@@ -1,62 +1,63 @@
-\contentsline {section}{\numberline {1}Introduction}{4}{section.1}
-\contentsline {subsection}{\numberline {1.1}Motivation}{5}{subsection.1.1}
-\contentsline {subsubsection}{\numberline {1.1.1}Abstraction increases readability.}{5}{subsubsection.1.1.1}
-\contentsline {subsubsection}{\numberline {1.1.2}Compartmentalization of functionality increases usability:}{6}{subsubsection.1.1.2}
-\contentsline {subsubsection}{\numberline {1.1.3}Approximating higher order functionality whilst keeping performance}{6}{subsubsection.1.1.3}
-\contentsline {subsection}{\numberline {1.2}Problem definition}{7}{subsection.1.2}
-\contentsline {subsubsection}{\numberline {1.2.1}Scope of project}{7}{subsubsection.1.2.1}
-\contentsline {subsection}{\numberline {1.3}Related work}{8}{subsection.1.3}
-\contentsline {section}{\numberline {2}Type aliases}{9}{section.2}
-\contentsline {subsection}{\numberline {2.1}The language}{9}{subsection.2.1}
-\contentsline {subsubsection}{\numberline {2.1.1}Interference rules}{10}{subsubsection.2.1.1}
-\contentsline {subsection}{\numberline {2.2}Implementation}{11}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Parsing a type alias}{13}{subsection.2.3}
-\contentsline {subsubsection}{\numberline {2.3.1}Data types for describing a type}{13}{subsubsection.2.3.1}
-\contentsline {subsubsection}{\numberline {2.3.2}Adding resolved types to scope}{14}{subsubsection.2.3.2}
-\contentsline {subsubsection}{\numberline {2.3.3}Converting UserType to TypeBase}{15}{subsubsection.2.3.3}
-\contentsline {subsubsection}{\numberline {2.3.4}Why we added UserType instead of extending TypeBase}{15}{subsubsection.2.3.4}
-\contentsline {subsubsection}{\numberline {2.3.5}The slip from type aliases to realized types}{16}{subsubsection.2.3.5}
-\contentsline {subsection}{\numberline {2.4}Results}{16}{subsection.2.4}
-\contentsline {subsubsection}{\numberline {2.4.1}A type cannot be defined twice in the same environment}{16}{subsubsection.2.4.1}
-\contentsline {subsubsection}{\numberline {2.4.2}A type alias cannot be defined, if it refers to a type alias that has not been defined}{17}{subsubsection.2.4.2}
-\contentsline {subsubsection}{\numberline {2.4.3}A type alias cannot be cyclically defined}{17}{subsubsection.2.4.3}
-\contentsline {subsubsection}{\numberline {2.4.4}Example of planet simulations being simplified by type aliases}{18}{subsubsection.2.4.4}
-\contentsline {subsection}{\numberline {2.5}Future work}{18}{subsection.2.5}
-\contentsline {section}{\numberline {3}Structures}{19}{section.3}
-\contentsline {subsubsection}{\numberline {3.0.1}Accessing types and functions within structures}{20}{subsubsection.3.0.1}
-\contentsline {subsection}{\numberline {3.1}Interference rules}{21}{subsection.3.1}
-\contentsline {subsubsection}{\numberline {3.1.1}Interference rules for adding multiple declarations}{21}{subsubsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.2}Rule for adding a structure to the local environment}{22}{subsubsection.3.1.2}
-\contentsline {subsubsection}{\numberline {3.1.3}Interference rules for interpreting functions and types in an environment with structures}{22}{subsubsection.3.1.3}
-\contentsline {subsection}{\numberline {3.2}Implementation}{22}{subsection.3.2}
-\contentsline {subsubsection}{\numberline {3.2.1}The Scope datatype}{23}{subsubsection.3.2.1}
-\contentsline {subsubsection}{\numberline {3.2.2}checkProg}{23}{subsubsection.3.2.2}
-\contentsline {subsubsection}{\numberline {3.2.3}Checking for duplicates}{23}{subsubsection.3.2.3}
-\contentsline {subsubsection}{\numberline {3.2.4}Dividing a Futhark program into chunks}{24}{subsubsection.3.2.4}
-\contentsline {subsubsection}{\numberline {3.2.5}Checking function- and type declarations}{25}{subsubsection.3.2.5}
-\contentsline {subsubsection}{\numberline {3.2.6}Checking structure declarations}{25}{subsubsection.3.2.6}
-\contentsline {subsubsection}{\numberline {3.2.7}Resolving the application of a longname}{26}{subsubsection.3.2.7}
-\contentsline {subsubsection}{\numberline {3.2.8}Including structures, functions and types from other files}{26}{subsubsection.3.2.8}
-\contentsline {subsubsection}{\numberline {3.2.9}Keeping track of function names}{26}{subsubsection.3.2.9}
-\contentsline {subsection}{\numberline {3.3}Tests}{27}{subsection.3.3}
-\contentsline {subsubsection}{\numberline {3.3.1}Testing rule for multiple declarations [...]}{27}{subsubsection.3.3.1}
-\contentsline {subsubsection}{\numberline {3.3.2}Testing structures can be called as expected}{29}{subsubsection.3.3.2}
-\contentsline {subsubsection}{\numberline {3.3.3}Testing rule for variable shadowing}{32}{subsubsection.3.3.3}
-\contentsline {subsection}{\numberline {3.4}Results}{34}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}Future work}{34}{subsection.3.5}
-\contentsline {section}{\numberline {4}Signatures}{35}{section.4}
-\contentsline {subsection}{\numberline {4.1}Purpose of module signatures}{35}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Implementation}{36}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Results}{37}{subsection.4.3}
-\contentsline {section}{\numberline {5}Functors}{38}{section.5}
-\contentsline {subsection}{\numberline {5.1}The reason for functors}{39}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Tentative implementation of functors}{39}{subsection.5.2}
-\contentsline {section}{\numberline {6}Discussion of results}{42}{section.6}
-\contentsline {subsection}{\numberline {6.1}Method}{42}{subsection.6.1}
-\contentsline {subsubsection}{\numberline {6.1.1}Alternatives to the chosen method}{43}{subsubsection.6.1.1}
-\contentsline {subsection}{\numberline {6.2}Conclusion}{43}{subsection.6.2}
-\contentsline {subsection}{\numberline {6.3}Acknowledgements}{44}{subsection.6.3}
-\contentsline {section}{\numberline {7}Appendices}{46}{section.7}
-\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{46}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{47}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{50}{subsection.7.3}
+\contentsline {section}{\numberline {1}Introduction}{5}{section.1}
+\contentsline {subsection}{\numberline {1.1}Motivation}{6}{subsection.1.1}
+\contentsline {subsubsection}{\numberline {1.1.1}Abstraction increases readability.}{6}{subsubsection.1.1.1}
+\contentsline {subsubsection}{\numberline {1.1.2}Compartmentalization of functionality increases usability:}{7}{subsubsection.1.1.2}
+\contentsline {subsubsection}{\numberline {1.1.3}Approximating higher order functionality whilst keeping performance}{7}{subsubsection.1.1.3}
+\contentsline {subsection}{\numberline {1.2}Problem definition}{8}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Scope of project}{8}{subsubsection.1.2.1}
+\contentsline {subsection}{\numberline {1.3}Related work}{10}{subsection.1.3}
+\contentsline {section}{\numberline {2}Type aliases}{11}{section.2}
+\contentsline {subsection}{\numberline {2.1}The language}{11}{subsection.2.1}
+\contentsline {subsubsection}{\numberline {2.1.1}Interference rules}{12}{subsubsection.2.1.1}
+\contentsline {subsection}{\numberline {2.2}Implementation}{13}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Parsing a type alias}{15}{subsection.2.3}
+\contentsline {subsubsection}{\numberline {2.3.1}Data types for describing a type}{15}{subsubsection.2.3.1}
+\contentsline {subsubsection}{\numberline {2.3.2}Adding resolved types to scope}{16}{subsubsection.2.3.2}
+\contentsline {subsubsection}{\numberline {2.3.3}Converting UserType to TypeBase}{17}{subsubsection.2.3.3}
+\contentsline {subsubsection}{\numberline {2.3.4}Why we added UserType instead of extending TypeBase}{17}{subsubsection.2.3.4}
+\contentsline {subsubsection}{\numberline {2.3.5}The slip from type aliases to realized types}{18}{subsubsection.2.3.5}
+\contentsline {subsection}{\numberline {2.4}Results}{18}{subsection.2.4}
+\contentsline {subsubsection}{\numberline {2.4.1}A type cannot be defined twice in the same environment}{18}{subsubsection.2.4.1}
+\contentsline {subsubsection}{\numberline {2.4.2}A type alias cannot be defined, if it refers to a type alias that has not been defined}{19}{subsubsection.2.4.2}
+\contentsline {subsubsection}{\numberline {2.4.3}A type alias cannot be cyclically defined}{19}{subsubsection.2.4.3}
+\contentsline {subsubsection}{\numberline {2.4.4}Example of planet simulations being simplified by type aliases}{20}{subsubsection.2.4.4}
+\contentsline {subsection}{\numberline {2.5}Future work}{20}{subsection.2.5}
+\contentsline {section}{\numberline {3}Structures}{21}{section.3}
+\contentsline {subsubsection}{\numberline {3.0.1}Accessing types and functions within structures}{22}{subsubsection.3.0.1}
+\contentsline {subsection}{\numberline {3.1}Interference rules}{23}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Interference rules for adding multiple declarations}{23}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Rule for adding a structure to the local environment}{24}{subsubsection.3.1.2}
+\contentsline {subsubsection}{\numberline {3.1.3}Interference rules for interpreting functions and types in an environment with structures}{24}{subsubsection.3.1.3}
+\contentsline {subsection}{\numberline {3.2}Implementation}{25}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}The Scope datatype}{25}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}checkProg}{25}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Checking for duplicates}{26}{subsubsection.3.2.3}
+\contentsline {subsubsection}{\numberline {3.2.4}Dividing a Futhark program into chunks}{26}{subsubsection.3.2.4}
+\contentsline {subsubsection}{\numberline {3.2.5}Checking function- and type declarations }{28}{subsubsection.3.2.5}
+\contentsline {subsubsection}{\numberline {3.2.6}Checking structure declarations}{28}{subsubsection.3.2.6}
+\contentsline {subsubsection}{\numberline {3.2.7}Resolving the application of a longname}{29}{subsubsection.3.2.7}
+\contentsline {subsubsection}{\numberline {3.2.8}Including structures, functions and types from other files}{29}{subsubsection.3.2.8}
+\contentsline {subsubsection}{\numberline {3.2.9}Keeping track of function names}{30}{subsubsection.3.2.9}
+\contentsline {subsection}{\numberline {3.3}Tests}{30}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Testing rule for multiple declarations [...]}{30}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Testing structures can be called as expected}{32}{subsubsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3}Testing rule for variable shadowing}{35}{subsubsection.3.3.3}
+\contentsline {subsection}{\numberline {3.4}Results}{37}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Future work}{37}{subsection.3.5}
+\contentsline {section}{\numberline {4}Signatures}{38}{section.4}
+\contentsline {subsection}{\numberline {4.1}Purpose of module signatures}{38}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Implementation}{39}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Results}{40}{subsection.4.3}
+\contentsline {section}{\numberline {5}Functors}{41}{section.5}
+\contentsline {subsection}{\numberline {5.1}The reason for functors}{42}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Tentative implementation of functors}{42}{subsection.5.2}
+\contentsline {section}{\numberline {6}Discussion of results}{45}{section.6}
+\contentsline {subsection}{\numberline {6.1}Method}{45}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Alternatives to the chosen method}{46}{subsubsection.6.1.1}
+\contentsline {subsection}{\numberline {6.2}Conclusion}{46}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Acknowledgements}{47}{subsection.6.3}
+\contentsline {section}{\numberline {7}Appendices}{49}{section.7}
+\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{49}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{50}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{53}{subsection.7.3}
+\contentsline {section}{\numberline {8}References}{56}{section.8}

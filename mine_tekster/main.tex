@@ -30,6 +30,8 @@
   framextopmargin=50pt,
   frame=bottomline
   }
+\setlength{\parskip}{6pt}
+\setlength\parindent{0pt}
 \tcbset{colback=blue!5!white}
 \title{
   Modules in Futhark \\
@@ -38,12 +40,11 @@
 \author{Mikkel Storgaard Knudsen}
 \pagestyle{fancy}
 \begin{document}
-
 \maketitle
 
 \subsection*{Abstract}
 \label{subsec:abstract}
-This report investigates the benefits and possibilities of implementing a module system in the programming language Futhark. On the basis of the Standard ML module system, both a type aliasing system and a module structure system is succesfully designed (and defined with interference rules) and implemented in Futhark.
+This report investigates the benefits and possibilities of implementing a module system in the programming language Futhark. On the basis of the Standard ML module system, both a type aliasing system and a module structure system is succesfully designed (and defined with interference rules), and implemented in Futhark.
 Both type aliases and structures are tested in up against their interference rules, to confirm that they indeed adhere to their rules.\\
 Finally, tentative implementations of module signatures- and functors are proposed on the background of the work and experience gained during the two first feature implementations of the project.
 \\\\
@@ -107,8 +108,8 @@ Finally, tentative implementations of module signatures- and functors are propos
 % takketaler akkrediteringer whatevs
 
 \subimport{appendices/}{appendix_main.tex}
-
+\clearpage
+\section{References}
 \bibliographystyle{plain}
 \bibliography{litteratur}
 \end{document}
-
