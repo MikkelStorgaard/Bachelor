@@ -1,9 +1,7 @@
 \section{Type aliases}
 To make an implementation of functors\ref{functors} in Futhark, it was necessary
-to implement type aliases first.
-
-
-
+to implement type aliases first. Otherwise, it would not be possible to abstract
+a type away in an alias.
 \subsection{The language}\label{futharks_types}
 The initial type system in Futhark supported the following type definitions:
 \begin{align*}
@@ -21,7 +19,6 @@ The initial type system in Futhark supported the following type definitions:
                  &\ | & FloatType \\
                  &\ | & Boolean \\
 \end{align*}
-
 Implementing type aliases expands our type constructions as following:
 \begin{align*}
   Type           & : & \texttt{Primitive type} \\
@@ -40,18 +37,18 @@ Implementing type aliases expands our type constructions as following:
                  &\ | & \texttt{Boolean} \\
   \\
   \\
-  TypeAlias      & :  & \texttt{type}\ strid\ \texttt{=}\ Type \\
+  TypeAlias      & :  & \texttt{type}\ type\_id\ \texttt{=}\ Type \\
 \end{align*}
 where $type\_id$ is short for \textit{string id}, a string identifier.
 
 \subsubsection{Interference rules}
-A type alias in a Futhark program is done like this: \texttt{type} \textit{Strids} \texttt{=} \textit{Type} ,\\
+A type alias in a Futhark program is done like this: \texttt{type} \textit{type id} \texttt{=} \textit{Type} ,\\
 where \textit{Type} is as defined in the grammar above.
 \\
 \label{typealiasinterference}
 \begin{tcolorbox}
 Given an environment
-$\Gamma : \{FE, TE\},\ Types = \{ strid \to Type \},\ Type \to \tau\footnote{We will let $\tau$ designate a primitive type in Futhark}$
+$\Gamma : \{FE, TE\},\ Types = \{ type\_id \to Type \},\ Type \to \tau\footnote{We will let $\tau$ designate a primitive type in Futhark}$
 we can define the following interference rules for using type aliases:
 
 \begin{prooftree}
@@ -64,8 +61,8 @@ we can define the following interference rules for using type aliases:
 \end{prooftree}
 where
 \begin{align*}
-             & \{ \emptyset , \{ strid \to Type \} \} \oplus \Gamma  \\
- \Rightarrow & Types(\Gamma) \leftarrow \ Types(\Gamma) \cup \{strid \to Type\}
+             & \{ \emptyset , \{ type\_id \to Type \} \} \oplus \Gamma  \\
+ \Rightarrow & Types(\Gamma) \leftarrow \ Types(\Gamma) \cup \{type\_id \to Type\}
 \end{align*}
 \\
 iff the type alias declaration does not
@@ -73,25 +70,11 @@ clash with the current environment. There is no clash, if the declaration obeys
 the three rules in the implementation subsection\ref{typealiasimplementation}.
 \\
 \\
-We can assign the same type to several string ids simultaneously, as long as we don't declare the same type alias twice.
-\begin{prooftree}
-  \AxiomC{$\Gamma \vdash typedecl \Rightarrow \Gamma ' $}
-  \AxiomC{Strids = $strid_1 , ... , strid_n$ }
-    \BinaryInfC{ $\Gamma \vdash$\texttt{type }\textit{Strids }\texttt{= }
-      \textit{Type} $\Rightarrow$ $\{ strid_1 \to Type, .. , strid_n \to Type \} \oplus \Gamma \Rightarrow \Gamma' \}$}
-\end{prooftree}
-      where
-\begin{align*}
-             & \{ strid_1 \to Type, \cdots,  strid_n \to Type, \} \oplus \Gamma  \\
- \Rightarrow & Types(\Gamma) \rightarrow \ Types(\Gamma) \cup \{ strid_1 \to Type, \cdots,  strid_n \to Type \}
-\end{align*}
-      
-
 \end{tcolorbox}
 \subsection{Implementation}\label{typealiasimplementation}
-A type alias $strid_i \to Type$ declaration is succesful, if three rules are followed:
+A type alias $type\_id_i \to Type$ declaration is succesful, if three rules are followed:
 \begin{enumerate}
-  \item The alias $strid_i$ is not already declared\footnote{This is by convention of
+  \item The alias $type\_id_i$ is not already declared\footnote{This is by convention of
       only being able to define a value \textit{once}} in the current local
     environment. I.e. the example below:
     \begin{verbatim}
@@ -99,9 +82,9 @@ A type alias $strid_i \to Type$ declaration is succesful, if three rules are fol
       type foo = f32
     \end{verbatim}
 \clearpage
-  \item The alias $strid_i$ refers to a type (or a type alias), that is either already
+  \item The alias $type\_id_i$ refers to a type (or a type alias), that is either already
     defined in the current environment (including structure environments), or is
-    in the same declaration chunk as $strid_i$. In the example below, \texttt{foo} refers
+    in the same declaration chunk as $type\_id_i$. In the example below, \texttt{foo} refers
     to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.\\
     \\
     Therefore, \texttt{foo} can be resolved by resolving \texttt{bar}. The implementation of this
@@ -247,9 +230,9 @@ State monad inside the reader.
 \noindent
 If this is not immediately possible, we must either continue our search for the type, throw an error due to a cyclical type definition, or throw an error because the type alias has not been defined yet.
 \\
-If our attempt to resolve $strid_a$ leads to another alias
-$strid_b$\footnote{line 27-33}, we add
-$strid_a$ to our reader environment using the function \texttt{local}, and
+If our attempt to resolve $type\_id_a$ leads to another alias
+$type\_id_b$\footnote{line 27-33}, we add
+$type\_id_a$ to our reader environment using the function \texttt{local}, and
 process $alias_b$ instead.
 \\
 \\
@@ -377,12 +360,15 @@ problem\footnote{\url{https://en.wikipedia.org/wiki/N-body\_problem}}.
 The original Futhark implementation of the simulation contained function
 arguments of tuples with arity up to 10. Whilst it is still necessary to bring
 all the arguments throughout the program, type aliasing makes the program itself
-much more readable:
+much more readable.
+\\
+The two nbody implementations, one with type aliasing and one without, are
+available in appendix \ref{nbody_before} and \ref{nbody_after}.
 \subsection{Future work}
 To make functors work, it must be possible to declare an abstract type alias in
 a structure.\\
 \\
-That will allow for a structure definition, where a type variable\footnote{in the form of a \textit{strid}} has been declared, but not defined, until the containing structure is instantiated using a functor.
+That will allow for a structure definition, where a type variable\footnote{in the form of a \textit{type\_id}} has been declared, but not defined, until the containing structure is instantiated using a functor.
 \\
 This has not been implemented yet.
 \clearpage

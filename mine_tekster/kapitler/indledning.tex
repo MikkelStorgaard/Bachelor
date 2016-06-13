@@ -78,9 +78,8 @@ fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 \noindent
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
-Coupled with helper functions, we can now multiply the speed of the sphere like
-this:
-\begin{figure}
+Coupled with helper functions, we can now multiply the speed of the sphere\ref{sphere_example}.
+\begin{figure}\label{sphere_example}
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
 type position, direction = vec3 
@@ -95,6 +94,8 @@ fun sphere multiply_velocity(
     let new_direction = multiply_vector(direction, factor)
     in {radius, position, new_direction}
 \end{verbatim}
+\caption{Type aliasing abstracts type definitions into names that are more
+  fitting for the function declaration at hand}
 \end{figure}
 
 \noindent As we are now using the sphere type as the function argument, we can pattern
@@ -115,34 +116,42 @@ modules.
 It is possible to express higher-order functionality in Futhark, without taking
 a performance hit in the compiled Futhark code.
 %% reference to slow higher order functionality
-We will reiterate on the concept of modules\ref{sec:structures}, by introducing
+We will reiterate on the concept of structures\ref{sec:structures}, by introducing
 the concept of functors.\\
-First we repeat the three-dimensional vector module
+First we repeat the three-dimensional vector structure
 from earlier, but without declaring any particular
-primitive \ref{futharks_types} type as the contained type of the vector:
-\begin{verbatim}
-  struct Vec3 {
-      type vector = {t, t, t}
-      fun vector add( ... ) = ...
-      fun vector subtract( ... ) = ...
-      fun vector multiply ( ... ) = ...
-      fun vector divide ( ... ) = ...
-  }
-\end{verbatim}
+primitive \ref{futharks_types} type as the contained type of the vector\ref{struct_vec3}.
+
+\begin{figure}\label{struct_vec3}
+  \begin{verbatim}
+  functor Vec3 ( number_type : NumType) { 
+        type t = number_type.t
+        type vector = {t, t, t}
+        fun vector add( ... ) = ...
+        fun vector subtract( ... ) = ...
+        fun vector multiply ( ... ) = ...
+        fun vector divide ( ... ) = ...
+    }
+  \end{verbatim}
+\end{figure}
 \noindent
-The structure above cannot be used on its own. Type \texttt{t} is not
+The structure\ref{struct_vec3} above cannot be used on its own. Type \texttt{t} is not
 instantiated, and the module cannot be type checked, which causes an error.
 
 \noindent
-We can solve that problem, by instantiating the abstract structure, using a
-simple functor; the \texttt{where}-clause.
+We can solve that problem, by applying the abstract structure on a concrete
+structure.
+
+\begin{figure}
 \label{first_functor_example}
 \begin{verbatim}
   struct Int {
     type t = int 
-  }
+  } : NumType
   struct IntVec3 = Vec3(Int)
 \end{verbatim}
+\caption{The IntVec3 structure is an instance of Vec3.}
+\end{figure}
 \noindent
 We can now access the structure \texttt{IntVec3} throughout the rest of the
 program.
