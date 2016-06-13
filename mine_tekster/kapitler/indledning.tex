@@ -19,7 +19,6 @@ choice of programming language for a given project, can be decided by the number
 available, project relevant modules.
 \\
 \\
-\\
 The module system design for Futhark has been inspired by the module system
 implemented in Standard ML\cite{crash_course}. Not only does the Standard ML
 modules enable structures with predefined implementations.
@@ -42,7 +41,6 @@ This spares the developers for writing a lot of almost identical code. Refer to
 \textbf{Reader expectations}:\\
 The reader is expected to have experience with statically typed languages,
 functional programming, and preferable the Haskell programming language.
-
 \pagebreak
 \subsection{Motivation}
 \label{subsec:label}
@@ -58,15 +56,8 @@ Futhark, without having side effects on the performance of the compiled Futhark 
 The following subsections contain the features this project is implementing, and
 examples of why these features are desirable.
 \subsubsection{Abstraction increases readability.} 
-Type aliasing lets us abstract from the actual definition of data types.
-When writing our source code, we can define our type aliases before writing the
-rest of our program.
-%% skriv bedre
-If we want to define a sphere in a three dimensional space, we want to define it
-with \\
-\textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
-moving.\\
-Let us define a function that multiplies the speed of the sphere by a factor k:
+\begin{figure}
+\begin{mdframed}
 \begin{lstlisting}
 fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 	{f32 r, 
@@ -75,11 +66,25 @@ fun {f32, {f32, f32, f32}, {f32, f32, f32}} multiply_velocity(
 	  =
     {r, {x_pos, y_pos, z_pos}, {k * x_dir , k * y_dir, k * z_dir }}
 \end{lstlisting}
+\caption{A function polluted by all the references to \texttt{f32} \label{noalias}}
+\end{mdframed}
+\label{noaliasing}
+\end{figure}
+Type aliasing lets us abstract from the actual definition of data types.
+When writing our source code, we can define our type aliases before writing the
+rest of our program.
+%% skriv bedre
+If we want to define a sphere in a three dimensional space, we want to define it
+with \\
+\textbf{1) a radius}, \textbf{2) a position} , and \textbf{3) a direction} that it is
+moving.\\
+Let us define a function that multiplies the speed of the sphere by a factor k: (Figure ~\ref{noalias})
+\clearpage
 \noindent
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
 Coupled with helper functions, we can now multiply the speed of the sphere\ref{sphere_example}.
-\begin{figure}\label{sphere_example}
+\begin{figure}
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
 type position, direction = vec3 
@@ -95,7 +100,7 @@ fun sphere multiply_velocity(
     in {radius, position, new_direction}
 \end{verbatim}
 \caption{Type aliasing abstracts type definitions into names that are more
-  fitting for the function declaration at hand}
+  fitting for the function declaration at hand \label{sphere_example}}
 \end{figure}
 
 \noindent As we are now using the sphere type as the function argument, we can pattern
@@ -103,7 +108,7 @@ match on the type aliased values contained in the sphere type.
 Most importantly, the vectors of the sphere are abstracized into a single variables
 instead of tuples.
 \\
-The end result is a shorter, more readable program~\ref{nbody_after}
+The end result is a shorter, more readable program.\ref{nbody_after}
 
 \subsubsection{Compartmentalization of functionality increases usability:}
 Splitting code functionality into multiple files, will allow the programmer to
@@ -121,8 +126,7 @@ the concept of functors.\\
 First we repeat the three-dimensional vector structure
 from earlier, but without declaring any particular
 primitive \ref{futharks_types} type as the contained type of the vector\ref{struct_vec3}.
-
-\begin{figure}\label{struct_vec3}
+\begin{figure}
   \begin{verbatim}
   functor Vec3 ( number_type : NumType) { 
         type t = number_type.t
@@ -133,6 +137,7 @@ primitive \ref{futharks_types} type as the contained type of the vector\ref{stru
         fun vector divide ( ... ) = ...
     }
   \end{verbatim}
+  \caption{A functor defining a vector structure \label{struct_vec3}}
 \end{figure}
 \noindent
 The structure\ref{struct_vec3} above cannot be used on its own. Type \texttt{t} is not
@@ -143,14 +148,15 @@ We can solve that problem, by applying the abstract structure on a concrete
 structure.
 
 \begin{figure}
-\label{first_functor_example}
+
 \begin{verbatim}
   struct Int {
     type t = int 
   } : NumType
   struct IntVec3 = Vec3(Int)
 \end{verbatim}
-\caption{The IntVec3 structure is an instance of Vec3.}
+\caption{The IntVec3 structure is an instance of Vec3. \label{first_functor_example}}
+
 \end{figure}
 \noindent
 We can now access the structure \texttt{IntVec3} throughout the rest of the
@@ -190,8 +196,8 @@ The scope of the project is
 \clearpage
 
 \subsection{Related work}
-Futhark modules are designed with Standard MLs module system in mind. Thus, \textit{The
-Definition of Standard ML '97} \ref{definition} has been a source of inspiration
+Futhark modules are designed with Standard MLs module system in mind. Thus, 
+\textit{The Definition of Standard ML '97} \citep{sml_book} has been a source of inspiration
 for the behaviour of the Futhark module system. \\
 However, I have not read the code implementation of SML modules. My code supervisor and I did not find it necessary to lean on the SML implementation of modules:\\
 The Futhark compiler could readily support extensions to the language, and it was not difficult to

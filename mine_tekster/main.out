@@ -51,8 +51,12 @@
 \BOOKMARK [1][-]{section.5}{Functors}{}% 51
 \BOOKMARK [2][-]{subsection.5.1}{The reason for functors}{section.5}% 52
 \BOOKMARK [2][-]{subsection.5.2}{Tentative implementation of functors}{section.5}% 53
-\BOOKMARK [1][-]{section.6}{Final section}{}% 54
-\BOOKMARK [2][-]{subsection.6.1}{Discussion of results}{section.6}% 55
-\BOOKMARK [2][-]{subsection.6.2}{Method}{section.6}% 56
-\BOOKMARK [2][-]{subsection.6.3}{Conclusion}{section.6}% 57
-\BOOKMARK [2][-]{subsection.6.4}{Acknowledgements}{section.6}% 58
+\BOOKMARK [1][-]{section.6}{Discussion of results}{}% 54
+\BOOKMARK [2][-]{subsection.6.1}{Method}{section.6}% 55
+\BOOKMARK [3][-]{subsubsection.6.1.1}{Alternatives to the chosen method}{subsection.6.1}% 56
+\BOOKMARK [2][-]{subsection.6.2}{Conclusion}{section.6}% 57
+\BOOKMARK [2][-]{subsection.6.3}{Acknowledgements}{section.6}% 58
+\BOOKMARK [1][-]{section.7}{Appendices}{}% 59
+\BOOKMARK [2][-]{subsection.7.1}{Futhark Module Language}{section.7}% 60
+\BOOKMARK [2][-]{subsection.7.2}{nbody before type aliasing}{section.7}% 61
+\BOOKMARK [2][-]{subsection.7.3}{nbody using type aliasing}{section.7}% 62

@@ -17,9 +17,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage{dsfont}
 \usepackage{relsize}
+\usepackage{fancyhdr}
 \usepackage{float}
 \usepackage{pgffor}
 \usepackage{courier}
+\usepackage{mdframed}
 
 \usepackage[margin=1in]{geometry}
 \lstset{ %
@@ -34,7 +36,9 @@
 \textit{Bachelor's thesis}
 }
 \author{Mikkel Storgaard Knudsen}
+\pagestyle{fancy}
 \begin{document}
+
 \maketitle
 
 \subsection*{Abstract}
@@ -104,8 +108,7 @@ Finally, tentative implementations of module signatures- and functors are propos
 
 \subimport{appendices/}{appendix_main.tex}
 
-
-\bibliographystyle{te}
+\bibliographystyle{plain}
 \bibliography{litteratur}
 \end{document}
 
