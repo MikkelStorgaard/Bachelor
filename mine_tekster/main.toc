@@ -23,41 +23,41 @@
 \contentsline {subsubsection}{\numberline {2.4.4}Example of planet simulations being simplified by type aliases}{20}{subsubsection.2.4.4}
 \contentsline {subsection}{\numberline {2.5}Future work}{20}{subsection.2.5}
 \contentsline {section}{\numberline {3}Structures}{21}{section.3}
-\contentsline {subsubsection}{\numberline {3.0.1}Accessing types and functions within structures}{22}{subsubsection.3.0.1}
-\contentsline {subsection}{\numberline {3.1}Interference rules}{23}{subsection.3.1}
-\contentsline {subsubsection}{\numberline {3.1.1}Interference rules for adding multiple declarations}{23}{subsubsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.2}Rule for adding a structure to the local environment}{24}{subsubsection.3.1.2}
-\contentsline {subsubsection}{\numberline {3.1.3}Interference rules for interpreting functions and types in an environment with structures}{24}{subsubsection.3.1.3}
-\contentsline {subsection}{\numberline {3.2}Implementation}{25}{subsection.3.2}
-\contentsline {subsubsection}{\numberline {3.2.1}The Scope datatype}{25}{subsubsection.3.2.1}
-\contentsline {subsubsection}{\numberline {3.2.2}checkProg}{25}{subsubsection.3.2.2}
-\contentsline {subsubsection}{\numberline {3.2.3}Checking for duplicates}{26}{subsubsection.3.2.3}
-\contentsline {subsubsection}{\numberline {3.2.4}Dividing a Futhark program into chunks}{26}{subsubsection.3.2.4}
-\contentsline {subsubsection}{\numberline {3.2.5}Checking function- and type declarations }{28}{subsubsection.3.2.5}
-\contentsline {subsubsection}{\numberline {3.2.6}Checking structure declarations}{28}{subsubsection.3.2.6}
-\contentsline {subsubsection}{\numberline {3.2.7}Resolving the application of a longname}{29}{subsubsection.3.2.7}
-\contentsline {subsubsection}{\numberline {3.2.8}Including structures, functions and types from other files}{29}{subsubsection.3.2.8}
-\contentsline {subsubsection}{\numberline {3.2.9}Keeping track of function names}{30}{subsubsection.3.2.9}
-\contentsline {subsection}{\numberline {3.3}Tests}{30}{subsection.3.3}
-\contentsline {subsubsection}{\numberline {3.3.1}Testing rule for multiple declarations [...]}{30}{subsubsection.3.3.1}
-\contentsline {subsubsection}{\numberline {3.3.2}Testing structures can be called as expected}{32}{subsubsection.3.3.2}
-\contentsline {subsubsection}{\numberline {3.3.3}Testing rule for variable shadowing}{35}{subsubsection.3.3.3}
-\contentsline {subsection}{\numberline {3.4}Results}{37}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}Future work}{37}{subsection.3.5}
-\contentsline {section}{\numberline {4}Signatures}{38}{section.4}
-\contentsline {subsection}{\numberline {4.1}Purpose of module signatures}{38}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Implementation}{39}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Results}{40}{subsection.4.3}
-\contentsline {section}{\numberline {5}Functors}{41}{section.5}
-\contentsline {subsection}{\numberline {5.1}The reason for functors}{42}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Tentative implementation of functors}{42}{subsection.5.2}
-\contentsline {section}{\numberline {6}Discussion of results}{45}{section.6}
-\contentsline {subsection}{\numberline {6.1}Method}{45}{subsection.6.1}
-\contentsline {subsubsection}{\numberline {6.1.1}Alternatives to the chosen method}{46}{subsubsection.6.1.1}
-\contentsline {subsection}{\numberline {6.2}Conclusion}{46}{subsection.6.2}
-\contentsline {subsection}{\numberline {6.3}Acknowledgements}{47}{subsection.6.3}
-\contentsline {section}{\numberline {7}Appendices}{49}{section.7}
-\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{49}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{50}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{53}{subsection.7.3}
-\contentsline {section}{\numberline {8}References}{56}{section.8}
+\contentsline {subsubsection}{\numberline {3.0.1}Accessing types and functions within structures}{23}{subsubsection.3.0.1}
+\contentsline {subsection}{\numberline {3.1}Interference rules}{24}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Interference rules for adding multiple declarations}{25}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Rule for adding a structure to the local environment}{25}{subsubsection.3.1.2}
+\contentsline {subsubsection}{\numberline {3.1.3}Interference rules for interpreting functions and types in an environment with structures}{26}{subsubsection.3.1.3}
+\contentsline {subsection}{\numberline {3.2}Implementation}{26}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}The Scope datatype}{27}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}checkProg}{27}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Checking for duplicates}{27}{subsubsection.3.2.3}
+\contentsline {subsubsection}{\numberline {3.2.4}Dividing a Futhark program into chunks}{28}{subsubsection.3.2.4}
+\contentsline {subsubsection}{\numberline {3.2.5}Checking function- and type declarations }{29}{subsubsection.3.2.5}
+\contentsline {subsubsection}{\numberline {3.2.6}Checking structure declarations}{29}{subsubsection.3.2.6}
+\contentsline {subsubsection}{\numberline {3.2.7}Resolving the application of a longname}{30}{subsubsection.3.2.7}
+\contentsline {subsubsection}{\numberline {3.2.8}Including structures, functions and types from other files}{30}{subsubsection.3.2.8}
+\contentsline {subsubsection}{\numberline {3.2.9}Keeping track of function names}{31}{subsubsection.3.2.9}
+\contentsline {subsection}{\numberline {3.3}Tests}{31}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Testing rule for multiple declarations [...]}{31}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Testing structures can be called as expected}{33}{subsubsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3}Testing rule for variable shadowing}{36}{subsubsection.3.3.3}
+\contentsline {subsection}{\numberline {3.4}Results}{38}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Future work}{38}{subsection.3.5}
+\contentsline {section}{\numberline {4}Signatures}{39}{section.4}
+\contentsline {subsection}{\numberline {4.1}Purpose of module signatures}{39}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Implementation}{40}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Results}{41}{subsection.4.3}
+\contentsline {section}{\numberline {5}Functors}{42}{section.5}
+\contentsline {subsection}{\numberline {5.1}The reason for functors}{43}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Tentative implementation of functors}{43}{subsection.5.2}
+\contentsline {section}{\numberline {6}Discussion of results}{46}{section.6}
+\contentsline {subsection}{\numberline {6.1}Method}{46}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Alternatives to the chosen method}{47}{subsubsection.6.1.1}
+\contentsline {subsection}{\numberline {6.2}Conclusion}{47}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Acknowledgements}{48}{subsection.6.3}
+\contentsline {section}{\numberline {7}Appendices}{50}{section.7}
+\contentsline {subsection}{\numberline {7.1}Futhark Module Language}{50}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}nbody before type aliasing}{51}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}nbody using type aliasing}{54}{subsection.7.3}
+\contentsline {section}{\numberline {8}References}{57}{section.8}

@@ -20,7 +20,7 @@ Not only does the Standard ML modules enable structures with predefined implemen
 These abstract structures are applied on an argument of a fitting signature, returning a realized structure. This makes it possible to write structures that does not commit to one certain type, but instead inherits the functionality defined in the given argument.
 
 
-This spares the developers for writing a lot of almost identical code. Refer to (Figure \ref{first_functor_example}) for a simple example.
+This spares the developers for writing a lot of almost identical code. Refer to (Figure 2{first_functor_example}) for a simple example.
 
 
 \textbf{Reader expectations}:
@@ -58,7 +58,7 @@ Let us define a function that multiplies the speed of the sphere by a factor k: 
 
 With type aliasing, we can compartmentalize the data type, and remove the need
 for explicitally typing out every parameter of function input.
-Coupled with helper functions, we can now multiply the speed of the sphere\ref{sphere_example} without being explicit about the actual types at each function call.
+Coupled with helper functions, we can now multiply the speed of the sphere (Figure ~\ref{sphere_example}) without being explicit about the actual types at each function call.
 \begin{figure}
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
@@ -96,7 +96,7 @@ modules.
 It is possible to express higher-order functionality in Futhark, without taking
 a performance hit in the compiled Futhark code.
 %% reference to slow higher order functionality
-We will reiterate on the concept of structures\ref{sec:structures}, by introducing
+We will reiterate on the concept of structures (Section \ref{sec:structures}), by introducing
 the concept of functors.\\
 First we repeat the three-dimensional vector structure
 from earlier, but without declaring any particular
@@ -115,7 +115,7 @@ primitive type (Section ~\ref{futharks_types}) as the contained type of the vect
   \caption{A functor defining a vector structure \label{struct_vec3}}
 \end{figure}
 
-The structure\ref{struct_vec3} above cannot be used on its own. Type \texttt{t} is not
+The structure (Figure ~\ref{struct_vec3}) above cannot be used on its own. Type \texttt{t} is not
 instantiated, and the module cannot be type checked, which causes an error.
 
 

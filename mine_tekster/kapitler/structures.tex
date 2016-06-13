@@ -3,8 +3,7 @@
 \textbf{Introduction to structures:}\\
 \label{subsec:structuresintroduction}
 Without structures, every function and type in futhark shares the same scope.
-Implementing structures lets us create functions that are alike, but keeps
-distinctions between them.
+Implementing structures lets us create function with the same name, but differenct implementations.
 Take this example of a program with two different vector types:
 \begin{verbatim}
 type vec3 = {f32, f32, f32}
@@ -20,11 +19,9 @@ fun vec4 vec4_plus(
   vec4 {b_1, ..., b_4}
   ) = {a_1 + b_1, ... , a_4 + b_4}
 \end{verbatim}
-\noindent
-Let us try compartmentalizing a vector type and its functions into a structure.\\
-  In the following example, we have defined two different structures, each
-containing a structure,
-and a futhark program which includes and utilizes these structures:
+
+Let us try compartmentalizing a vector type and its functions into a structure.
+We now have two different structures, each containing a structure itself.
 \begin{verbatim}
 Vec3Float.fut:
   structure Vec3Float = 
@@ -45,6 +42,7 @@ Vec4Float.fut:
     end
 \end{verbatim}
 \clearpage
+We also have a futhark program which includes and utilizes these structures:
 \begin{verbatim}
 myprogram.fut:
 
@@ -55,21 +53,22 @@ myprogram.fut:
   type vec4 = Vec4Float.vector
   
   fun vec4 foo(vec3 vector) = 
-    let {a, b, c} = Vec3.plus(vector, vector)
-    in Vec4.multiply({a, b, c, 1.0f} , 4.0f)
+    let {a, b, c} = Vec3Float.plus(vector, vector)
+    in Vec4Float.multiply({a, b, c, 1.0f} , 4.0f)
 \end{verbatim}
-\noindent
+
 Whilst it \textit{is} possible to create libraries without a structure
 implementation \footnote{By including libraries that adds functions to the top
   level environment}, the user runs a risk of running into errors like
 \texttt{MulipleDefinitionError}\footnote{Multiple functions of same name
   defined}, if any of the library functions uses any of the names, that the
 local user is using as well.
-\\\\
-The module system removes this hazard, as application of functions and types are
-done using \textbf{longnames}, which adds prefixes to names. This way, functions
-can have the same name, as long as they do not share the same prefix.
 
+
+The module system removes this hazard, as application of functions and types are
+done using \textbf{longnames}(Figure \ref{LongnameDef}), which adds prefixes to names. This way, functions
+can have the same name, as long as they do not share the same prefix.
+\begin{figure}
 \begin{tcolorbox}
 \textbf{Longnames:}\\
 A longname consists of any amount of prefixes followed by a dot, followed by the
@@ -79,11 +78,11 @@ LongName & :  & \texttt{prefix.}LongName \\
          &\ | & \texttt{identifier}
 \end{align*}
 
-In Futhark we will be using string ids for declarations, and longnames for
-the accessing types and functions in structures.
-
-
+\caption{In Futhark we will be using string ids for declarations, and longnames for
+the accessing types and functions in structures. \label{LongnameDef}}
 \end{tcolorbox}
+\end{figure}
+\clearpage
 \subsubsection{Accessing types and functions within structures}
 To work with type aliases and structures, we need to define the internal
 environment of Futhark during compile time.\\
@@ -102,7 +101,7 @@ A structure can be regarded as a structure name and an environment contained in 
 $\{strid \to \Gamma_{strid}\}$ is a mapping in \textit{STRUCTE}.
 Any $\Gamma_{strid}$ contains its own function-, typealias-, signature-, structure- and functor declarations.\\
 \\
-
+\clearpage
 \subsection{Interference rules}\label{structuresinterferencerules}
 Now that we can discern between the global environment, and any number of
 environments in structures, we must redefine the environment behaviour of Futhark at compile time.
@@ -134,8 +133,8 @@ addition of any of these four elements follow a generalized rule:
   \begin{tcolorbox}
     \begin{prooftree}
       \AxiomC{ $\Gamma \vdash Decl_1 \Rightarrow \Gamma' $ }
-      \AxiomC{ $\Gamma \not\vdash id \to decltype\ Decl_2$ }
-        \BinaryInfC{ $\Gamma \vdash$ \texttt{decltype} \textit{id }\texttt{=} \textit{decl} $\Rightarrow \{ id \to Decl \} $ }
+      \AxiomC{ $\Gamma \not\vdash id \to \texttt{decltype}\ Decl_2$ }
+        \BinaryInfC{ $\Gamma \vdash$ \texttt{decltype} \textit{id }\texttt{=} \textit{Decl} $\Rightarrow \{ id \to Decl \} $ }
       \end{prooftree}
     \end{tcolorbox}
     \caption{A generalized rule for adding declarations to the environment \label{RuleAddDecl}}
@@ -143,6 +142,7 @@ addition of any of these four elements follow a generalized rule:
 Please note, that several declarations can actually share name \textit{id}, as
 long as they don't share declaration type.\\
 \\
+\clearpage
 \subsubsection{Interference rules for adding multiple declarations}
 Finally, we want to create a rule for which environment we get, when we state
 multiple declarations in a row.
@@ -158,7 +158,7 @@ multiple declarations in a row.
   \caption{The behaviour of multiple declarations in a row. \label{RuleAddMultiple}}
 \end{figure}
 This rule is covers the run of an entire program, since we can set the initial
-declaration in the program as $Decl_1$, use rule \ref{RuleAddMultiple} to handle
+declaration in the program as $Decl_1$, and then use the rule in (Figure \ref{RuleAddMultiple}) to handle
 the first declaration in the pair $Decl_1$ and $Decl_2$, and afterwards using
 the same rule again on $Decl_2$, $Decl_3$.
 \\
@@ -183,7 +183,7 @@ The definition of a structure in Futhark has the following behaviour.
   \caption{The behavior of constructing a structure.\label{RuleAddStruct}}
 \end{figure}
 The consequence of defining $\Gamma_{strid}$ as a union of new declarations together with the old environment menas, that Futhark exhibits variable shadowing, where definitions in a structure are valid in its nested structures, unless they are redefined in the nested structure.
-
+\clearpage
 \subsubsection{Interference rules for interpreting functions and types in an
   environment with structures}\label{interpretingfunctionsandtypeswithstructures}
 There are three cases where it is necessary to resolve a function or a type from a
@@ -259,7 +259,7 @@ checkProg' checks the initial top level of declaratations for duplicates.
 %$
 \subsubsection{Checking for duplicates}
 \label{subsec:checkingforduplicates}
-As described in rule \ref{RuleAddDecl}, we allow multiple declarations of same name,
+As described in rule (Figure ~\ref{RuleAddDecl}), we allow multiple declarations of same name,
 as long as they don't share type:
 In example, checking for two function definitions of the same type is done in
 the first case of checkForDuplicateDecs:
@@ -340,7 +340,7 @@ section \ref{structuresinterferencerules}.\\
 execution.\\
 4) checkFunOrTypeDec does the actual typechecking of the function declaration. \\
 5) The remainder of the declarations chunked in chompDecs is checked using
-checkDecs. Note, that the first element of \texttt{rest} must be a structure
+\texttt{checkDecs}. Note, that the first element of \texttt{rest} must be a structure
 declaration, due to the implementation of chompDecs.\\
 \subsubsection{Checking structure declarations\label{checkingstructuredeclarations}}
 Please note that structures are currently called modules inside Futharks compiler.
@@ -353,7 +353,7 @@ checkDecs (ModDec modd:rest) = do
       return (scope, ModDec modd' : rest' )
 \end{lstlisting}
 %$
-When checkDecs encounters a \texttt{ModDec}, \texttt{checkMod} is called to resolve the \texttt{ModDec}.
+When \texttt{checkDecs} encounters a \texttt{ModDec}, \texttt{checkMod} is called to resolve the \texttt{ModDec}.
 The ModDec defines an environment of functions and type declarations called
 modscope, which we add to the local environment by calling \texttt{local
   (addModule modscope)}\\
@@ -367,7 +367,7 @@ checkMod (ModDef name decs loc) =
     return (scope, ModDef name decs' loc)
 \end{lstlisting}
 %$
-checkMod first adds a ``breadcrumb'' of the structure's name (\textit{strid}) to
+\texttt{checkMod} first adds a ``breadcrumb''\footnote{The breadcrumb keeps track of the prefixes of the \texttt{longname}} of the structure's name (\textit{strid}) to
 the local environment. 
 
 After the environment has been given its name, the internal declaration of the

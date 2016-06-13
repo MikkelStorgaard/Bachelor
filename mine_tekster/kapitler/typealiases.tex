@@ -1,5 +1,5 @@
 \section{Type aliases}
-To make an implementation of functors\ref{sec:functors} in Futhark, it was necessary
+To make an implementation of functors (Section \ref{sec:functors}) in Futhark, it was necessary
 to implement type aliases first. Otherwise, it would not be possible to abstract
 a type away in an alias.
 \subsection{The language}\label{futharks_types}
@@ -67,7 +67,7 @@ where
 \\
 iff the type alias declaration does not
 clash with the current environment. There is no clash, if the declaration obeys
-the three rules in the implementation subsection\ref{typealiasimplementation}.
+the three rules in the implementation (Subsection ~\ref{typealiasimplementation}).
 \\
 \\
 \end{tcolorbox}
@@ -88,14 +88,14 @@ A type alias $type\_id_i \to Type$ declaration is succesful, if three rules are 
     to \texttt{bar,} but \texttt{bar} is in the same chunk as \texttt{foo}.\\
     \\
     Therefore, \texttt{foo} can be resolved by resolving \texttt{bar}. The implementation of this
-    described in a later subsection\ref{typealiasingcode}.
+    described in Subsection ~\ref{typealiasingcode}.
     \begin{verbatim} 
       type foo = bar
       type bar = {f32, i32}
     \end{verbatim}
     There are no hard limit to the number of type aliases that has to be
     checked, before a type alias is resolved:
-    \label{longchain}
+	\begin{figure}
       \begin{verbatim}
         type foo = bar
         type bar = {f32, baz, i32}
@@ -106,13 +106,15 @@ A type alias $type\_id_i \to Type$ declaration is succesful, if three rules are 
   
         type bep = i32
         \end{verbatim}
+      \caption{A long chain of type aliasing \label{longchain}}
+    \end{figure}
     Such a chain of type aliases is allowed, as long as the last of the three
     rules is obeyed:
     \\
     \\
-  \item The alias being resolved cannot be cyclically defined.\label{cyclicaldefinitionerror}\\
+  \item The alias being resolved cannot be cyclically defined.\\
     Imagine that some type \texttt{type my\_type = foo} is in the chain in the
-    type aliasing example\ref{longchain} above.\\
+    type aliasing example (Figure ~\ref{longchain}.)\\
 
     In this case, the compiler is first trying to resolve \texttt{foo} by
     resolving \texttt{bar,} and trying to resolving \texttt{bar} by resolving \texttt{baz}, et cetera. \\
@@ -126,7 +128,7 @@ A type alias $type\_id_i \to Type$ declaration is succesful, if three rules are 
     resolved.
 
     If so, the compiler returns an error.
-    The implementation of this can be read here\ref{typealiasimplementation}
+    The implementation of this can be read in subsection \ref{typealiasimplementation}.
 \end{enumerate}
 \subsection{Parsing a type alias}
 \subsubsection{Data types for describing a type}
@@ -215,15 +217,14 @@ contains the TypeM monad.
 \\
 \noindent
 The reader monad is used to contain a HashSet as its environment. This
-environment is used to keep check of cyclical definitions as described in
-\ref{cyclicaldefinitionerror}.
+environment is used to keep check of cyclical definitions.
 \\
 \\
 For each type alias, we use the function \texttt{process} to resolve the type, and modify
 the scope contained within the state monad of the ReaderT.
 \\
 Resolving a type from a type aliasing is done using the function \texttt{typeOfName} in
-the code snippet\ref{typealiasingcode}. \texttt{typeOfName} tries to
+the subsection ~\ref{typealiasingcode}. \texttt{typeOfName} tries to
 resolve the type by name by retrieving the scope contained in the transformed
 State monad inside the reader.
 \clearpage
@@ -304,7 +305,7 @@ To verify this, Futhark has been tested to pass all of the tests in futharks
 test suite\footnote{located in folder \texttt{futhark/data/tests}}.
 
 However, it was also necessary to write tests to specifically confirm, that the
-implementation respects the rules defined in \ref{typealiasimplementation}.
+implementation respects the rules defined in Subsection ~\ref{typealiasimplementation}.
 The original pull request for working type aliases can be found here:~\cite{typealias_commit}.
 \subsubsection{A type cannot be defined twice in the same environment}
 From \texttt{alias-error3.fut} in \texttt{futhark/src/data/tests/types}:
